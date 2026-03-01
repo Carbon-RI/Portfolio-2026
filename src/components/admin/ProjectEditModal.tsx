@@ -1,0 +1,273 @@
+"use client";
+
+import React, {
+  useMemo,
+  useState,
+  useCallback,
+  startTransition,
+  useEffect,
+} from "react";
+import { useRouter } from "next/navigation";
+import { FullProjectData, ProjectStatus } from "@/types";
+import {
+  mergeProjectAndDraft,
+  getEditorStatus,
+} from "@/services/utils/project-converter";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import { useProjectEditor } from "@/hooks/admin/useProjectEditor";
+import { BasicInfoEditor } from "@/components/admin/BasicInfoEditor";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+
+interface ProjectEditModalProps {
+  initialProject: FullProjectData;
+  onClose: () => void;
+  onDelete: (id: string) => Promise<void>;
+  onProjectDataChange: () => void;
+  isCreatingNew: boolean;
+}
+
+export const ProjectEditModal = ({
+  initialProject,
+  onClose,
+  onDelete,
+  onProjectDataChange,
+  isCreatingNew,
+}: ProjectEditModalProps) => {
+  const router = useRouter();
+  const [confirmState, setConfirmState] = useState<{
+    isOpen: boolean;
+    mode: "publish" | "delete" | null;
+  }>({ isOpen: false, mode: null });
+
+  const [hasSavedDuringSession, setHasSavedDuringSession] = useState(false);
+  const [showSavedText, setShowSavedText] = useState(false);
+
+  useEffect(() => {
+    setHasSavedDuringSession(false);
+  }, [initialProject.id]);
+
+  const baseData = useMemo(() => {
+    if (isCreatingNew) {
+      return {
+        id: initialProject.id,
+        slug: "",
+        title: "",
+        summary: "",
+        githubUrl: "",
+        demoUrl: "",
+        industry: "",
+        category: [],
+        techStack: [],
+        imageSrc: "",
+        sections: [],
+        published: false,
+        is_deleted: false,
+        showDetail: false,
+      };
+    }
+    return mergeProjectAndDraft(initialProject);
+  }, [initialProject, isCreatingNew]);
+
+  const {
+    draftData,
+    isUploading,
+    previewUrl,
+    isSlugValid,
+    handleFieldChange,
+    handleToggleTech,
+    handleImageUpload,
+    save,
+  } = useProjectEditor(baseData);
+
+  const isDirty = useMemo(
+    () => JSON.stringify(draftData) !== JSON.stringify(baseData),
+    [draftData, baseData]
+  );
+
+  const executeAction = useCallback(
+    async (mode: "draft" | "publish") => {
+      try {
+        const targetSlug = await new Promise<string>((resolve, reject) => {
+          save(mode, (slug) => {
+            startTransition(() => {
+              onProjectDataChange();
+            });
+            resolve(slug);
+          }).catch(reject);
+        });
+
+        if (mode === "publish") {
+          onClose();
+        } else {
+          setHasSavedDuringSession(true);
+          setShowSavedText(true);
+          setTimeout(() => setShowSavedText(false), 2000);
+        }
+        return targetSlug;
+      } catch (error) {
+        console.error("Action failed:", error);
+        throw error;
+      }
+    },
+    [save, onProjectDataChange, onClose]
+  );
+
+  const editorStatus: ProjectStatus = useMemo(() => {
+    return getEditorStatus(draftData, isCreatingNew, hasSavedDuringSession);
+  }, [draftData, isCreatingNew, hasSavedDuringSession]);
+
+  const statusDisplay = useMemo(() => {
+    const config: Record<ProjectStatus, { label: string; className: string }> =
+      {
+        NewDraft: { label: "NEW", className: "text-accent-2" },
+        DraftModified: { label: "Drafted", className: "text-accent-2" },
+        Unpublished: { label: "Unpublished", className: "text-accent-2" },
+        Published: { label: "Published", className: "text-accent-1" },
+        Deleted: { label: "Deleted", className: "text-red-500" },
+      };
+    return (
+      config[editorStatus] || {
+        label: "Unknown",
+        className: "text-layer-muted",
+      }
+    );
+  }, [editorStatus]);
+
+  return (
+    <>
+      <div
+        className="modal-overlay z-100 animate-in fade-in duration-normal"
+        onClick={onClose}
+      >
+        <div
+          className="modal-content-md text-content-primary max-h-[90dvh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-normal"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <header className="modal-header border-b border-base-border/50">
+            <div className="flex flex-col">
+              <h2 className="text-sm-mono text-layer-medium truncate max-w-100">
+                {isCreatingNew
+                  ? "Create New Project"
+                  : `Editing / ${initialProject.title}`}
+              </h2>
+              <div className="flex gap-3 items-center mt-1 h-4 font-bold text-tiny uppercase tracking-widest">
+                <span className={statusDisplay.className}>
+                  {statusDisplay.label}
+                </span>
+                {(isDirty || showSavedText) && (
+                  <>
+                    <span className="text-layer-subtle">|</span>
+                    {isDirty ? (
+                      <span className="text-layer-medium italic lowercase animate-pulse">
+                        drafting...
+                      </span>
+                    ) : (
+                      <span className="text-accent-1">Changes Saved</span>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-layer-medium hover:text-content-primary text-3xl transition-colors"
+            >
+              &times;
+            </button>
+          </header>
+
+          <main className="grow overflow-y-auto p-8 space-y-16 no-scrollbar bg-base-bg">
+            <ErrorBoundary
+              fallback={
+                <div className="p-10 text-center text-accent-2">
+                  Editor encounterd an error.
+                </div>
+              }
+              resetKeys={[draftData.id]}
+            >
+              <BasicInfoEditor
+                draftData={draftData}
+                previewUrl={previewUrl}
+                isSlugValid={isSlugValid}
+                handleFieldChange={handleFieldChange}
+                handleToggleTech={handleToggleTech}
+                handleImageUpload={handleImageUpload}
+                onNavigateToDetail={async () => {
+                  const targetSlug = await executeAction("draft");
+                  router.push(`/projects/${targetSlug}?edit=true`);
+                }}
+              />
+            </ErrorBoundary>
+          </main>
+
+          <footer className="modal-footer border-t border-base-border bg-layer-faint/30">
+            <button
+              onClick={() => setConfirmState({ isOpen: true, mode: "delete" })}
+              className="text-xs-mono text-accent-2 px-4 py-2 hover:bg-accent-2/5 transition-all disabled:opacity-30"
+              disabled={isCreatingNew || isUploading}
+            >
+              [ Delete ]
+            </button>
+            <div className="flex gap-4 items-center">
+              <button
+                onClick={onClose}
+                className="text-sm-mono px-4 py-2 hover:text-accent-2 transition-colors"
+              >
+                {hasSavedDuringSession ? "Close" : "Cancel"}
+              </button>
+              <button
+                onClick={() => executeAction("draft")}
+                className="btn-outline text-xs-mono text-accent-1 px-4 py-2"
+                disabled={isUploading || !isDirty || !isSlugValid}
+              >
+                Save Draft
+              </button>
+              <button
+                onClick={() =>
+                  setConfirmState({ isOpen: true, mode: "publish" })
+                }
+                className="btn-base font-bold bg-content-primary text-base-bg px-8 py-2.5 text-xs-mono disabled:opacity-30"
+                disabled={
+                  isUploading ||
+                  !isSlugValid ||
+                  (!isCreatingNew && initialProject.published && !isDirty)
+                }
+              >
+                Publish Now
+              </button>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        title={
+          confirmState.mode === "delete"
+            ? "Confirm Deletion"
+            : "Confirm Publication"
+        }
+        message={
+          confirmState.mode === "delete"
+            ? "This action will permanently delete the project draft."
+            : "Ready to make this project public?"
+        }
+        confirmLabel={
+          confirmState.mode === "delete" ? "Delete Now" : "Publish Now"
+        }
+        variant={confirmState.mode === "delete" ? "danger" : "primary"}
+        onConfirm={async () => {
+          const { mode } = confirmState;
+          setConfirmState({ isOpen: false, mode: null });
+          if (mode === "publish") await executeAction("publish");
+          else if (mode === "delete") {
+            await onDelete(initialProject.id);
+            onProjectDataChange();
+            onClose();
+          }
+        }}
+        onCancel={() => setConfirmState({ isOpen: false, mode: null })}
+      />
+    </>
+  );
+};
