@@ -1,0 +1,189 @@
+"use server";
+
+import "server-only";
+import { getAdminDb } from "@/lib/firebase/admin";
+import { FieldValue } from "firebase-admin/firestore";
+import { verifyAdminSession } from "@/services/server/auth-service";
+import {
+  FullProjectData,
+  ProjectCardData,
+  Result,
+  success,
+  failure,
+  unwrap,
+} from "@/types/index";
+import { mapToFullData } from "@/services/utils/project-converter";
+import { cleanFields } from "@/services/utils/object-utils";
+import { revalidatePath } from "next/cache";
+import { FB_COLLECTIONS } from "@/lib/constants";
+import { projectSchema } from "@/lib/validation/schemas";
+
+type ProjectSaveData = Partial<Omit<FullProjectData, "draft">>;
+
+// --- Helper ---
+function refreshProjectCache(slug?: string) {
+  revalidatePath("/");
+  if (slug) revalidatePath(`/projects/${slug}`);
+}
+
+// --- Queries (Server Only) ---
+export const getProjectData = async (
+  idOrSlug: string
+): Promise<Result<FullProjectData>> => {
+  if (!idOrSlug) return failure(new Error("ID or Slug is required"));
+  try {
+    const db = getAdminDb();
+    const docSnap = await db
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .doc(idOrSlug)
+      .get();
+    if (docSnap.exists) {
+      const data = docSnap.data();
+      if (data && !data.is_deleted)
+        return success(mapToFullData(docSnap.id, data));
+    }
+    const querySnap = await db
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .where("slug", "==", idOrSlug)
+      .where("is_deleted", "==", false)
+      .limit(1)
+      .get();
+    if (querySnap.empty)
+      return failure(new Error(`Project not found: ${idOrSlug}`));
+    const doc = querySnap.docs[0];
+    return success(mapToFullData(doc.id, doc.data()));
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : new Error("Failed to fetch project")
+    );
+  }
+};
+
+export const getPublishedProjects = async (): Promise<
+  Result<ProjectCardData[]>
+> => {
+  try {
+    const snap = await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .where("published", "==", true)
+      .where("is_deleted", "==", false)
+      .get();
+    return success(
+      snap.docs.map((d) => mapToFullData(d.id, d.data()) as ProjectCardData)
+    );
+  } catch (error) {
+    return failure(
+      error instanceof Error
+        ? error
+        : new Error("Failed to fetch published projects")
+    );
+  }
+};
+
+export const getAllProjects = async (): Promise<Result<ProjectCardData[]>> => {
+  try {
+    const snap = await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .where("is_deleted", "==", false)
+      .get();
+    return success(
+      snap.docs.map((d) => mapToFullData(d.id, d.data()) as ProjectCardData)
+    );
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : new Error("Failed to fetch all projects")
+    );
+  }
+};
+
+// --- Actions (Server Actions) ---
+export async function saveProjectDraft(
+  projectId: string,
+  fields: Partial<FullProjectData>
+): Promise<Result<void>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    const validated = projectSchema.partial().safeParse(fields);
+    if (!validated.success)
+      return failure(
+        validated.error.issues[0]?.message ?? "Invalid draft data"
+      );
+    const { draft: _, ...contentFields } = fields;
+    const { published, is_deleted, showDetail, slug } = fields;
+    await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .doc(projectId)
+      .set(
+        {
+          published: published ?? false,
+          is_deleted: is_deleted ?? false,
+          showDetail: showDetail ?? false,
+          draft: cleanFields(contentFields as ProjectSaveData),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    refreshProjectCache(slug);
+    return success(undefined);
+  } catch (error) {
+    return failure(error instanceof Error ? error : "Failed to save draft");
+  }
+}
+
+export async function publishProject(
+  projectId: string,
+  fields: Partial<FullProjectData>
+): Promise<Result<void>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    const validated = projectSchema.partial().safeParse(fields);
+    if (!validated.success)
+      return failure(
+        validated.error.issues[0]?.message ?? "Invalid project data"
+      );
+    const { draft: _, ...rootFields } = fields;
+    await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .doc(projectId)
+      .set(
+        {
+          ...cleanFields(rootFields as ProjectSaveData),
+          published: true,
+          is_deleted: false,
+          showDetail: rootFields.showDetail ?? false,
+          draft: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    refreshProjectCache(fields.slug);
+    return success(undefined);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : "Failed to publish project"
+    );
+  }
+}
+
+export async function softDeleteProject(
+  projectId: string,
+  slug?: string
+): Promise<Result<void>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    await getAdminDb().collection(FB_COLLECTIONS.PROJECTS).doc(projectId).set(
+      {
+        is_deleted: true,
+        published: false,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    refreshProjectCache(slug);
+    return success(undefined);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : "Failed to soft delete project"
+    );
+  }
+}
