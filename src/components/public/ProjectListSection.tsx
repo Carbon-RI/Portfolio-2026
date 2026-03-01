@@ -7,11 +7,10 @@ import { ProjectCardData, FullProjectData } from "@/types";
 interface ProjectListSectionProps {
   projects: ProjectCardData[];
   isAdmin: boolean;
-  onProjectDataChange: () => void; // 互換性のために維持
+  onProjectDataChange: () => void;
   onSelectProject: (project: FullProjectData) => void;
 }
 
-// テンプレート作成ロジックの分離（isAdmin時のみ動的に使う）
 const createNewProjectTemplate = (newId: string): FullProjectData => ({
   id: newId,
   slug: "",
@@ -44,7 +43,6 @@ export const ProjectListSection = ({
       }
 
       try {
-        // 実行時のみサーバーアクションをインポートすることでバンドルサイズを削減
         const { getProjectData } = await import(
           "@/services/server/project-service"
         );
@@ -62,7 +60,6 @@ export const ProjectListSection = ({
   const handleNewProject = useCallback(async () => {
     if (!isAdmin) return;
     try {
-      // FirebaseクライアントSDKも実行時のみインポート
       const { doc, collection } = await import("firebase/firestore");
       const { getDb } = await import("@/lib/firebase/client");
       const db = getDb();
@@ -80,7 +77,6 @@ export const ProjectListSection = ({
     <div id="projects-list-wrapper" className="h-full w-full">
       <div className="flex flex-row w-max h-full items-stretch flex-nowrap px-4 lg:px-6 md:px-8">
         {projects.map((project, index) => {
-          // Admin用の変換ロジックも、一般ユーザーには不要なら中で分岐
           const isLast = index === projects.length - 1 && !isAdmin;
 
           return (
@@ -91,7 +87,6 @@ export const ProjectListSection = ({
               isAdmin={isAdmin}
               onEditProject={() => onEditProject(project.id, project.slug)}
               showDetail={project.showDetail}
-              // LCPをWelcomeセクションに譲るため、priorityをfalseに（または1つだけに制限）
               priority={false}
               className={`${cardContainerClass} ${isLast ? "" : "mr-8"}`}
             />

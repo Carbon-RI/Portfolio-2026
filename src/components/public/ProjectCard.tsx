@@ -48,7 +48,6 @@ export const ProjectCard = ({
   const shouldShowDetailLink = isAdmin ? !!slug : showDetail;
   const isLCP = priority || index === 0;
 
-  // ステータスバッジのロジック
   let borderColorClass = "border-base-border";
   let statusBadge = null;
 
@@ -103,7 +102,6 @@ export const ProjectCard = ({
     >
       {statusBadge}
 
-      {/* 左/上セクション: ビジュアルとタイトル */}
       <div className="flex flex-col w-full shrink-0 header-border overflow-hidden bg-base-surface/20 [@media(max-height:500px)]:w-[42%] [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r border-base-border">
         <div className="aspect-video w-full relative overflow-hidden shrink-0 header-border">
           {isValidImageSrc ? (
@@ -141,7 +139,6 @@ export const ProjectCard = ({
         </div>
       </div>
 
-      {/* 右/下セクション: 説明とリンク */}
       <div className="p-5 lg:p-8 flex flex-col flex-1 bg-base-bg overflow-hidden">
         <div className="flex-1 mb-6">
           <p className="text-layer-medium text-sm lg:text-[15px] leading-relaxed font-light line-clamp-4 whitespace-pre-wrap">

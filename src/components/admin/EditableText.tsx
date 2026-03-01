@@ -42,7 +42,6 @@ export function EditableText<K extends string>({
   const handleDoubleClick = useCallback(() => {
     if (!isAdmin || isSaving) return;
     setIsEditing(true);
-    // React 19では自動フォーカス制御がより安定
     queueMicrotask(() => elementRef.current?.focus());
   }, [isAdmin, isSaving]);
 

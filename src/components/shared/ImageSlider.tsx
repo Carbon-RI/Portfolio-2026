@@ -47,7 +47,6 @@ export const ImageSlider = ({
 
   return (
     <div className="relative w-full h-full group bg-base-bg overflow-hidden border border-base-border">
-      {/* メイン表示エリア */}
       <div className="relative w-full h-full flex items-center justify-center">
         {isVideo ? (
           <div className="w-full aspect-video bg-black">
