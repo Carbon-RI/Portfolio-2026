@@ -22,6 +22,7 @@ interface ProjectEditModalProps {
   initialProject: FullProjectData;
   onClose: () => void;
   onDelete: (id: string) => Promise<void>;
+  onCancelNew: (id: string) => Promise<void>;
   onProjectDataChange: () => void | Promise<void>;
 }
 
@@ -29,6 +30,7 @@ export const ProjectEditModal = ({
   initialProject,
   onClose,
   onDelete,
+  onCancelNew,
   onProjectDataChange,
 }: ProjectEditModalProps) => {
   const router = useRouter();
@@ -65,9 +67,9 @@ export const ProjectEditModal = ({
   );
 
   const handleClose = useCallback(async () => {
-    // 一度も保存せずに閉じた新規プロジェクトは削除する
+    // 一度も保存せずに閉じた新規プロジェクトは物理削除する
     if (!hasSavedDuringSession && !initialProject.slug && !initialProject.published) {
-      await onDelete(initialProject.id);
+      await onCancelNew(initialProject.id);
       onProjectDataChange();
     }
     onClose();
@@ -75,7 +77,7 @@ export const ProjectEditModal = ({
     hasSavedDuringSession,
     initialProject.slug,
     initialProject.published,
-    onDelete,
+    onCancelNew,
     initialProject.id,
     onProjectDataChange,
     onClose,

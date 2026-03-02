@@ -194,3 +194,21 @@ export async function softDeleteProject(
     );
   }
 }
+
+export async function hardDeleteProject(
+  projectId: string
+): Promise<Result<void>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .doc(projectId)
+      .delete();
+    revalidatePath("/");
+    return success(undefined);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : "Failed to delete project"
+    );
+  }
+}

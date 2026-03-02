@@ -48,20 +48,15 @@ export const HomeClient = ({
     if (!isAdmin) return [];
     setLoading(true);
     try {
-      const [{ getAllProjects }, { mergeProjectAndDraft }] = await Promise.all([
-        import("@/services/server/project-service"),
-        import("@/services/utils/project-converter"),
-      ]);
-      const result = await getAllProjects();
-
-      if (result.success) {
-        const merged = result.data.map(mergeProjectAndDraft);
-        setProjects(merged);
-        return merged;
-      } else {
-        console.error("[Data] Failed to refetch projects:", result.error);
-        return [];
-      }
+      const [{ getAllProjectsClient }, { mergeProjectAndDraft }] =
+        await Promise.all([
+          import("@/services/client/project-service"),
+          import("@/services/utils/project-converter"),
+        ]);
+      const data = await getAllProjectsClient();
+      const merged = data.map(mergeProjectAndDraft);
+      setProjects(merged);
+      return merged;
     } catch (error) {
       console.error("[Data] Unexpected error during refetch:", error);
       return [];
@@ -98,21 +93,16 @@ export const HomeClient = ({
     if (editSlug) {
       const syncFullData = async () => {
         try {
-          const [{ getAllProjects }, { mergeProjectAndDraft }] =
+          const [{ getAllProjectsClient }, { mergeProjectAndDraft }] =
             await Promise.all([
-              import("@/services/server/project-service"),
+              import("@/services/client/project-service"),
               import("@/services/utils/project-converter"),
             ]);
-          const result = await getAllProjects();
-
-          if (result.success) {
-            const target = result.data.find(
-              (p: ProjectCardData) => p.slug === editSlug
-            );
-            if (target) {
-              setEditingProject(mergeProjectAndDraft(target));
-              window.history.replaceState(null, "", window.location.pathname);
-            }
+          const data = await getAllProjectsClient();
+          const target = data.find((p: ProjectCardData) => p.slug === editSlug);
+          if (target) {
+            setEditingProject(mergeProjectAndDraft(target));
+            window.history.replaceState(null, "", window.location.pathname);
           }
         } catch (e) {
           console.error("Failed to sync full project data:", e);
@@ -227,6 +217,15 @@ export const HomeClient = ({
             initialProject={editingProject}
             onClose={handleCloseEditModal}
             onProjectDataChange={refetchAndSyncEditingProject}
+            onCancelNew={async (id) => {
+              const { hardDeleteProject } = await import(
+                "@/services/server/project-service"
+              );
+              const result = await hardDeleteProject(id);
+              if (!result.success) {
+                console.error("Failed to delete new project:", result.error);
+              }
+            }}
             onDelete={async (id) => {
               const { softDeleteProject } = await import(
                 "@/services/server/project-service"

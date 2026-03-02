@@ -126,7 +126,10 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
   const [draftData, dispatch] = useReducer(
     projectReducer,
     initialProject,
-    (p) => projectSchema.parse(p) as FullProjectData
+    (p) => {
+      const result = projectSchema.safeParse(p);
+      return result.success ? (result.data as FullProjectData) : p;
+    }
   );
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(

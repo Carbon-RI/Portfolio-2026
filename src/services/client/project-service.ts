@@ -75,3 +75,16 @@ export const getPublishedProjectsClient = async (): Promise<
   const snap = await getDocs(q);
   return snap.docs.map((d) => mapToFullData(d.id, d.data()));
 };
+
+export const getAllProjectsClient = async (): Promise<ProjectCardData[]> => {
+  const { getFirestore, collection, query, where, getDocs } = await import(
+    "firebase/firestore"
+  );
+  const db = getFirestore(getFirebaseApp());
+  const q = query(
+    collection(db, FB_COLLECTIONS.PROJECTS),
+    where("is_deleted", "==", false)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => mapToFullData(d.id, d.data()));
+};

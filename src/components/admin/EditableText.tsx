@@ -7,6 +7,7 @@ import React, {
   useCallback,
   ElementType,
 } from "react";
+import { toast } from "sonner";
 
 export interface EditableBaseProps<K extends string> {
   field: K;
@@ -59,6 +60,7 @@ export function EditableText<K extends string>({
       } catch (error) {
         console.error("Failed to save:", error);
         if (elementRef.current) elementRef.current.textContent = currentValue;
+        toast.error("Failed to save. Please try again.");
       } finally {
         setIsSaving(false);
       }
