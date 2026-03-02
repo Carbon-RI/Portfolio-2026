@@ -115,46 +115,16 @@ const ProjectSection = ({
 
 export const ProjectContentClient = ({
   project: initialProject,
-  isAdmin: initialIsAdmin,
+  isAdmin,
 }: ProjectContentClientProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isFromBasicInfo = searchParams.get("edit") === "true";
-  const [isAdmin, setIsAdmin] = useState(initialIsAdmin);
-  const [project, setProject] = useState<FullProjectData>(initialProject);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [project] = useState<FullProjectData>(initialProject);
+  const [isEditMode, setIsEditMode] = useState(isAdmin && isFromBasicInfo);
 
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const upgradeToAdmin = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `/api/projects/${initialProject.slug}/admin`
-      );
-      if (response.ok) {
-        const adminProjectData = await response.json();
-        setProject(adminProjectData);
-        if (isFromBasicInfo) {
-          setIsEditMode(true);
-        }
-      }
-    } catch (e) {
-      console.error("Failed to sync admin project data", e);
-    }
-  }, [initialProject.slug, isFromBasicInfo]);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const res = await fetch("/api/auth/session");
-      const data = await res.json();
-      if (data.isAdmin) {
-        setIsAdmin(true);
-        await upgradeToAdmin();
-      }
-    };
-    checkSession();
-  }, [upgradeToAdmin]);
 
   const {
     draftData,

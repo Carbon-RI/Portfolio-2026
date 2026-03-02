@@ -1,13 +1,14 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
-import { AUTH_CONFIG } from "@/lib/constants";
-import { getPublishedProjects } from "@/services/server/project-service";
+import { verifyAdminSession } from "@/services/server/auth-service";
+import {
+  getPublishedProjects,
+  getAllProjects,
+} from "@/services/server/project-service";
+import { mergeProjectAndDraft } from "@/services/utils/project-converter";
 import { getProfileSettings } from "@/services/server/profile-service";
 import { defaultSettings } from "@/types/index";
-
-export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await getProfileSettings();
@@ -27,25 +28,27 @@ const HomeClient = dynamic(
 );
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const isAdmin = !!cookieStore.get(AUTH_CONFIG.SESSION_COOKIE);
-
-  const [projectsResult, profileResult] = await Promise.all([
-    getPublishedProjects(),
+  const [adminSession, profileResult] = await Promise.all([
+    verifyAdminSession(),
     getProfileSettings(),
   ]);
 
-  const projects = projectsResult.success ? projectsResult.data : [];
+  const isAdmin = adminSession.success;
+
+  const projectsResult = isAdmin
+    ? await getAllProjects()
+    : await getPublishedProjects();
+
+  // 管理者はドラフトをマージした最新データを表示
+  const projects = projectsResult.success
+    ? isAdmin
+      ? projectsResult.data.map(mergeProjectAndDraft)
+      : projectsResult.data
+    : [];
+
   const profileSettings = profileResult.success
     ? profileResult.data
     : defaultSettings;
-
-  if (!projectsResult.success || !profileResult.success) {
-    console.error("[Home Page] Data fetching failed:", {
-      projectsError: !projectsResult.success ? projectsResult.error : null,
-      profileError: !profileResult.success ? profileResult.error : null,
-    });
-  }
 
   return (
     <Suspense fallback={<div className="min-h-screen bg-base-bg" />}>

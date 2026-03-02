@@ -109,20 +109,19 @@ export async function saveProjectDraft(
         validated.error.issues[0]?.message ?? "Invalid draft data"
       );
 
-    const { draft: _, ...contentFields } = fields;
-    const { published, is_deleted, showDetail, slug, title } = fields;
+    const { draft: _, slug, title, published, showDetail, ...draftOnlyFields } = fields;
 
     await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
       .doc(projectId)
       .set(
         {
-          slug: slug,
-          title: title,
+          slug: slug ?? "",
+          title: title ?? "",
           published: published ?? false,
-          is_deleted: is_deleted ?? false,
+          is_deleted: false,
           showDetail: showDetail ?? false,
-          draft: cleanFields(contentFields as ProjectSaveData),
+          draft: cleanFields(draftOnlyFields as ProjectSaveData),
           updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true }

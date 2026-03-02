@@ -30,7 +30,7 @@ export const profileSettingsSchema = z.object({
 // --- Project Helper Schemas ---
 export const projectMediaSchema = z.object({
   type: z.enum(["image", "video", "youtube"]),
-  url: z.string().url("Please enter a valid media URL"),
+  url: z.string().url("Please enter a valid media URL").or(z.literal("")),
 });
 
 export const projectSectionSchema = z.object({

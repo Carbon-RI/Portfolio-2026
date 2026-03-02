@@ -44,22 +44,27 @@ export const HomeClient = ({
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("welcome");
 
-  const refetchProjects = useCallback(async () => {
-    if (!isAdmin) return;
+  const refetchProjects = useCallback(async (): Promise<ProjectCardData[]> => {
+    if (!isAdmin) return [];
     setLoading(true);
     try {
-      const { getAllProjects } = await import(
-        "@/services/server/project-service"
-      );
+      const [{ getAllProjects }, { mergeProjectAndDraft }] = await Promise.all([
+        import("@/services/server/project-service"),
+        import("@/services/utils/project-converter"),
+      ]);
       const result = await getAllProjects();
 
       if (result.success) {
-        setProjects(result.data);
+        const merged = result.data.map(mergeProjectAndDraft);
+        setProjects(merged);
+        return merged;
       } else {
         console.error("[Data] Failed to refetch projects:", result.error);
+        return [];
       }
     } catch (error) {
       console.error("[Data] Unexpected error during refetch:", error);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -75,6 +80,15 @@ export const HomeClient = ({
     }
   );
 
+  const refetchAndSyncEditingProject = useCallback(async () => {
+    const latest = await refetchProjects();
+    setEditingProject((prev) => {
+      if (!prev) return null;
+      const updated = latest.find((p) => p.id === prev.id);
+      return updated ? (updated as unknown as FullProjectData) : prev;
+    });
+  }, [refetchProjects]);
+
   const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -84,9 +98,11 @@ export const HomeClient = ({
     if (editSlug) {
       const syncFullData = async () => {
         try {
-          const { getAllProjects } = await import(
-            "@/services/server/project-service"
-          );
+          const [{ getAllProjects }, { mergeProjectAndDraft }] =
+            await Promise.all([
+              import("@/services/server/project-service"),
+              import("@/services/utils/project-converter"),
+            ]);
           const result = await getAllProjects();
 
           if (result.success) {
@@ -94,9 +110,8 @@ export const HomeClient = ({
               (p: ProjectCardData) => p.slug === editSlug
             );
             if (target) {
-              setEditingProject(target as FullProjectData);
-              const newUrl = window.location.pathname;
-              window.history.replaceState(null, "", newUrl);
+              setEditingProject(mergeProjectAndDraft(target));
+              window.history.replaceState(null, "", window.location.pathname);
             }
           }
         } catch (e) {
@@ -211,7 +226,7 @@ export const HomeClient = ({
           <ProjectEditModal
             initialProject={editingProject}
             onClose={handleCloseEditModal}
-            onProjectDataChange={refetchProjects}
+            onProjectDataChange={refetchAndSyncEditingProject}
             onDelete={async (id) => {
               const { softDeleteProject } = await import(
                 "@/services/server/project-service"
@@ -222,7 +237,6 @@ export const HomeClient = ({
               }
               refetchProjects();
             }}
-            isCreatingNew={editingProject.slug === "new-project-draft"}
           />
         </Suspense>
       )}

@@ -79,15 +79,20 @@ export const mapToFullData = (
 };
 
 export const mergeProjectAndDraft = (
-  project: FullProjectData
+  project: ProjectCardData | FullProjectData
 ): FullProjectData => {
-  if (!project.draft) return project;
+  const full = project as FullProjectData;
+  if (!full.draft) {
+    const { draft: _, ...rest } = full;
+    return rest as FullProjectData;
+  }
+  const { draft, ...base } = full;
   return {
-    ...project,
-    ...project.draft,
-    category: project.draft.category ?? project.category,
-    techStack: project.draft.techStack ?? project.techStack,
-    sections: project.draft.sections ?? project.sections,
+    ...base,
+    ...draft,
+    category: draft.category ?? base.category,
+    techStack: draft.techStack ?? base.techStack,
+    sections: draft.sections ?? base.sections,
   };
 };
 
