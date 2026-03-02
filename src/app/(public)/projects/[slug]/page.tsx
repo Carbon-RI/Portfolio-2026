@@ -10,21 +10,9 @@ import ProjectContentClient from "./_components/ProjectContentClient";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { Suspense } from "react";
 
-/**
- * Generates static params for all published projects.
- * Improved error logging for build-time debugging.
- */
 export async function generateStaticParams() {
   const result = await getPublishedProjects();
-
-  if (!result.success) {
-    console.error(
-      "[generateStaticParams] Failed to fetch projects:",
-      result.error
-    );
-    return [];
-  }
-
+  if (!result.success) return [];
   return result.data.map((project) => ({
     slug: project.slug,
   }));
@@ -32,6 +20,7 @@ export async function generateStaticParams() {
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ edit?: string }>;
 }
 
 export async function generateMetadata({
@@ -39,11 +28,7 @@ export async function generateMetadata({
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
   const result = await getProjectData(slug);
-
-  if (!result.success || !result.data.published || !result.data.showDetail) {
-    return {};
-  }
-
+  if (!result.success) return {};
   const project = result.data;
   return {
     title: project.title,
@@ -51,24 +36,32 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
+export default async function ProjectPage({
+  params,
+  searchParams,
+}: ProjectPageProps) {
   const { slug } = await params;
+  const { edit } = await searchParams;
 
-  const isAdmin = false;
+  const isAdmin = edit === "true";
 
   const result = await getProjectData(slug);
-
   if (!result.success) {
     notFound();
   }
 
-  const projectData = result.data;
+  // 管理者の場合は下書きをマージしたデータを、一般ユーザーは確定データを使用
+  const processedProject = isAdmin
+    ? mergeProjectAndDraft(result.data)
+    : result.data;
 
-  if (!projectData.published || !projectData.showDetail) {
+  // 管理者でない、かつ「非公開」または「詳細表示オフ」の場合は404
+  if (
+    !isAdmin &&
+    (!processedProject.published || !processedProject.showDetail)
+  ) {
     notFound();
   }
-
-  const processedProject = projectData;
 
   return (
     <ErrorBoundary

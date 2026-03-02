@@ -84,6 +84,21 @@ export const ProjectEditModal = ({
     [draftData, baseData]
   );
 
+  const handleClose = useCallback(async () => {
+    if (isCreatingNew && !hasSavedDuringSession) {
+      await onDelete(initialProject.id);
+      onProjectDataChange();
+    }
+    onClose();
+  }, [
+    isCreatingNew,
+    hasSavedDuringSession,
+    onDelete,
+    initialProject.id,
+    onProjectDataChange,
+    onClose,
+  ]);
+
   const executeAction = useCallback(
     async (mode: "draft" | "publish") => {
       try {
@@ -137,7 +152,7 @@ export const ProjectEditModal = ({
     <>
       <div
         className="modal-overlay z-100 animate-in fade-in duration-normal"
-        onClick={onClose}
+        onClick={handleClose}
       >
         <div
           className="modal-content-md text-content-primary max-h-[90dvh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-normal"
@@ -169,7 +184,7 @@ export const ProjectEditModal = ({
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-layer-medium hover:text-content-primary text-3xl transition-colors"
             >
               &times;
@@ -210,7 +225,7 @@ export const ProjectEditModal = ({
             </button>
             <div className="flex gap-4 items-center">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="text-sm-mono px-4 py-2 hover:text-accent-2 transition-colors"
               >
                 {hasSavedDuringSession ? "Close" : "Cancel"}

@@ -108,13 +108,17 @@ export async function saveProjectDraft(
       return failure(
         validated.error.issues[0]?.message ?? "Invalid draft data"
       );
+
     const { draft: _, ...contentFields } = fields;
-    const { published, is_deleted, showDetail, slug } = fields;
+    const { published, is_deleted, showDetail, slug, title } = fields;
+
     await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
       .doc(projectId)
       .set(
         {
+          slug: slug,
+          title: title,
           published: published ?? false,
           is_deleted: is_deleted ?? false,
           showDetail: showDetail ?? false,
@@ -123,6 +127,7 @@ export async function saveProjectDraft(
         },
         { merge: true }
       );
+
     refreshProjectCache(slug);
     return success(undefined);
   } catch (error) {
@@ -138,10 +143,11 @@ export async function publishProject(
     await unwrap(await verifyAdminSession());
     const validated = projectSchema.partial().safeParse(fields);
     if (!validated.success)
-      return failure(
-        validated.error.issues[0]?.message ?? "Invalid project data"
-      );
+      return failure(validated.error.issues[0]?.message ?? "Invalid data");
+
     const { draft: _, ...rootFields } = fields;
+    if (!rootFields.slug) return failure("Slug is required for publishing.");
+
     await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
       .doc(projectId)
@@ -156,11 +162,13 @@ export async function publishProject(
         },
         { merge: true }
       );
-    refreshProjectCache(fields.slug);
+
+    refreshProjectCache(rootFields.slug);
     return success(undefined);
   } catch (error) {
+    console.error("Publish Error:", error);
     return failure(
-      error instanceof Error ? error : "Failed to publish project"
+      error instanceof Error ? error : new Error("Failed to publish")
     );
   }
 }

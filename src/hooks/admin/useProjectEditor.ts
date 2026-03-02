@@ -239,7 +239,9 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
       if (!validation.success)
         return failure(validation.error.issues[0]?.message || "Invalid data");
 
-      const { id, slug, ...contentFields } = validation.data;
+      const { id, ...contentFields } = validation.data;
+      const { slug } = contentFields;
+
       if (!slug || slug === "new-project-draft")
         return failure("A valid URL link (Slug) is required.");
 
@@ -252,6 +254,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
           mode === "draft"
             ? await saveProjectDraft(id, contentFields as any)
             : await publishProject(id, contentFields as any);
+
         if (result.success && onSuccess) onSuccess(slug);
         return result.success
           ? success(undefined)
