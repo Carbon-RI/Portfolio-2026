@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useCallback, useState, Suspense, lazy } from "react";
-import {
-  ProjectCardData,
-  FullProjectData,
-  ProfileSettings,
-} from "@/types/index";
+import React, { useCallback, useMemo, useState, Suspense, lazy } from "react";
+import { FullProjectData, ProfileSettings } from "@/types/index";
+import { getAdminCardData } from "@/services/utils/project-converter";
 import {
   LinkedInIcon,
   GitHubIcon,
@@ -23,12 +20,12 @@ const EditableText = lazy(() =>
 ) as unknown as typeof EditableTextType;
 
 interface HomeRightPanelProps {
-  projects: ProjectCardData[];
+  projects: FullProjectData[];
   profileSettings: ProfileSettings;
   isAdmin: boolean;
   onProjectDataChange: () => void;
   onProfileUpdate: (updatedFields: Partial<ProfileSettings>) => void;
-  onSelectProject: (project: ProjectCardData | FullProjectData) => void;
+  onSelectProject: (project: FullProjectData) => void;
 }
 
 export const HomeRightPanel = ({
@@ -40,6 +37,12 @@ export const HomeRightPanel = ({
   onSelectProject,
 }: HomeRightPanelProps) => {
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+
+  const displayProjects = useMemo(
+    () =>
+      isAdmin ? projects.map((p) => getAdminCardData(p, true)) : projects,
+    [projects, isAdmin]
+  );
 
   const handleSave = useCallback(
     async (field: keyof ProfileSettings, newValue: string) => {
@@ -224,7 +227,7 @@ export const HomeRightPanel = ({
         >
           <div className="flex w-fit h-full px-6 md:px-0 md:pl-(--layout-side-margin) md:pr-(--layout-side-margin) lg:px-0 lg:w-full py-2 lg:py-4 items-stretch">
             <ProjectListSection
-              projects={projects}
+              projects={displayProjects}
               isAdmin={isAdmin}
               onProjectDataChange={onProjectDataChange}
               onSelectProject={onSelectProject}

@@ -6,7 +6,6 @@ import { FieldValue } from "firebase-admin/firestore";
 import { verifyAdminSession } from "@/services/server/auth-service";
 import {
   FullProjectData,
-  ProjectCardData,
   Result,
   success,
   failure,
@@ -60,7 +59,7 @@ export const getProjectData = async (
 };
 
 export const getPublishedProjects = async (): Promise<
-  Result<ProjectCardData[]>
+  Result<FullProjectData[]>
 > => {
   try {
     const snap = await getAdminDb()
@@ -68,9 +67,7 @@ export const getPublishedProjects = async (): Promise<
       .where("published", "==", true)
       .where("is_deleted", "==", false)
       .get();
-    return success(
-      snap.docs.map((d) => mapToFullData(d.id, d.data()) as ProjectCardData)
-    );
+    return success(snap.docs.map((d) => mapToFullData(d.id, d.data())));
   } catch (error) {
     return failure(
       error instanceof Error
@@ -80,15 +77,13 @@ export const getPublishedProjects = async (): Promise<
   }
 };
 
-export const getAllProjects = async (): Promise<Result<ProjectCardData[]>> => {
+export const getAllProjects = async (): Promise<Result<FullProjectData[]>> => {
   try {
     const snap = await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
       .where("is_deleted", "==", false)
       .get();
-    return success(
-      snap.docs.map((d) => mapToFullData(d.id, d.data()) as ProjectCardData)
-    );
+    return success(snap.docs.map((d) => mapToFullData(d.id, d.data())));
   } catch (error) {
     return failure(
       error instanceof Error ? error : new Error("Failed to fetch all projects")

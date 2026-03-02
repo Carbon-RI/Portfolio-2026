@@ -13,7 +13,7 @@ import { SplitLayout } from "@/components/layout/SplitLayout";
 import { HomeLeftPanel } from "./HomeLeftPanel";
 import { HomeRightPanel } from "./HomeRightPanel";
 import { SECTIONS, SectionId } from "@/types/index";
-import { ProjectCardData, FullProjectData } from "@/types/index";
+import { FullProjectData } from "@/types/index";
 import { ProfileSettings } from "@/types/index";
 
 const ProjectEditModal = lazy(() =>
@@ -23,7 +23,7 @@ const ProjectEditModal = lazy(() =>
 );
 
 interface HomeClientProps {
-  projects: ProjectCardData[];
+  projects: FullProjectData[];
   profileSettings: ProfileSettings;
   isAdmin: boolean;
 }
@@ -37,26 +37,23 @@ export const HomeClient = ({
   isAdmin,
 }: HomeClientProps) => {
   const searchParams = useSearchParams();
-  const [projects, setProjects] = useState<ProjectCardData[]>(initialProjects);
+  const [projects, setProjects] = useState<FullProjectData[]>(initialProjects);
   const [profileSettings, setProfileSettings] = useState<ProfileSettings>(
     initialProfileSettings
   );
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("welcome");
 
-  const refetchProjects = useCallback(async (): Promise<ProjectCardData[]> => {
+  const refetchProjects = useCallback(async (): Promise<FullProjectData[]> => {
     if (!isAdmin) return [];
     setLoading(true);
     try {
-      const [{ getAllProjectsClient }, { mergeProjectAndDraft }] =
-        await Promise.all([
-          import("@/services/client/project-service"),
-          import("@/services/utils/project-converter"),
-        ]);
+      const { getAllProjectsClient } = await import(
+        "@/services/client/project-service"
+      );
       const data = await getAllProjectsClient();
-      const merged = data.map(mergeProjectAndDraft);
-      setProjects(merged);
-      return merged;
+      setProjects(data);
+      return data;
     } catch (error) {
       console.error("[Data] Unexpected error during refetch:", error);
       return [];
@@ -71,7 +68,7 @@ export const HomeClient = ({
       const editSlug = searchParams.get("edit");
       if (!editSlug) return null;
       const found = projects.find((p) => p.slug === editSlug);
-      return found ? (found as unknown as FullProjectData) : null;
+      return found ?? null;
     }
   );
 
@@ -80,7 +77,7 @@ export const HomeClient = ({
     setEditingProject((prev) => {
       if (!prev) return null;
       const updated = latest.find((p) => p.id === prev.id);
-      return updated ? (updated as unknown as FullProjectData) : prev;
+      return updated ?? prev;
     });
   }, [refetchProjects]);
 
@@ -99,7 +96,7 @@ export const HomeClient = ({
               import("@/services/utils/project-converter"),
             ]);
           const data = await getAllProjectsClient();
-          const target = data.find((p: ProjectCardData) => p.slug === editSlug);
+          const target = data.find((p) => p.slug === editSlug);
           if (target) {
             setEditingProject(mergeProjectAndDraft(target));
             window.history.replaceState(null, "", window.location.pathname);
@@ -170,12 +167,9 @@ export const HomeClient = ({
     return () => observer.disconnect();
   }, []);
 
-  const handleOpenEditModal = useCallback(
-    (project: ProjectCardData | FullProjectData) => {
-      setEditingProject(project as FullProjectData);
-    },
-    []
-  );
+  const handleOpenEditModal = useCallback((project: FullProjectData) => {
+    setEditingProject(project);
+  }, []);
 
   const handleCloseEditModal = useCallback(() => {
     setEditingProject(null);

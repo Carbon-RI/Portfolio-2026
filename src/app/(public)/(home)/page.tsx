@@ -6,7 +6,6 @@ import {
   getPublishedProjects,
   getAllProjects,
 } from "@/services/server/project-service";
-import { mergeProjectAndDraft } from "@/services/utils/project-converter";
 import { getProfileSettings } from "@/services/server/profile-service";
 import { defaultSettings } from "@/types/index";
 
@@ -39,12 +38,8 @@ export default async function Home() {
     ? await getAllProjects()
     : await getPublishedProjects();
 
-  // 管理者はドラフトをマージした最新データを表示
-  const projects = projectsResult.success
-    ? isAdmin
-      ? projectsResult.data.map(mergeProjectAndDraft)
-      : projectsResult.data
-    : [];
+  // 管理者は生データを渡す（getAdminCardData でマージ・status 付与）
+  const projects = projectsResult.success ? projectsResult.data : [];
 
   const profileSettings = profileResult.success
     ? profileResult.data

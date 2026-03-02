@@ -6,7 +6,6 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   FullProjectData,
-  ProjectCardData,
   Result,
   success,
   failure,
@@ -61,7 +60,7 @@ export const getProjectDataClient = async (
 };
 
 export const getPublishedProjectsClient = async (): Promise<
-  ProjectCardData[]
+  FullProjectData[]
 > => {
   const { getFirestore, collection, query, where, getDocs } = await import(
     "firebase/firestore"
@@ -76,7 +75,7 @@ export const getPublishedProjectsClient = async (): Promise<
   return snap.docs.map((d) => mapToFullData(d.id, d.data()));
 };
 
-export const getAllProjectsClient = async (): Promise<ProjectCardData[]> => {
+export const getAllProjectsClient = async (): Promise<FullProjectData[]> => {
   const { getFirestore, collection, query, where, getDocs } = await import(
     "firebase/firestore"
   );

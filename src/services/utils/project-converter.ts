@@ -1,6 +1,5 @@
 import { TechIconKey } from "@/services/utils/tech-icons";
 import {
-  ProjectCardData,
   FullProjectData,
   ProjectStatus,
   ProjectSection,
@@ -79,14 +78,13 @@ export const mapToFullData = (
 };
 
 export const mergeProjectAndDraft = (
-  project: ProjectCardData | FullProjectData
+  project: FullProjectData
 ): FullProjectData => {
-  const full = project as FullProjectData;
-  if (!full.draft) {
-    const { draft: _, ...rest } = full;
+  if (!project.draft) {
+    const { draft: _, ...rest } = project;
     return rest as FullProjectData;
   }
-  const { draft, ...base } = full;
+  const { draft, ...base } = project;
   return {
     ...base,
     ...draft,
@@ -97,9 +95,9 @@ export const mergeProjectAndDraft = (
 };
 
 export const getAdminCardData = (
-  project: ProjectCardData,
+  project: FullProjectData,
   isAdmin: boolean
-): ProjectCardData & { status: ProjectStatus } => {
+): FullProjectData & { status: ProjectStatus } => {
   if (!isAdmin) return { ...project, status: "Published" };
   const status = getProjectStatus(project);
   const base = project.draft ? { ...project, ...project.draft } : project;
