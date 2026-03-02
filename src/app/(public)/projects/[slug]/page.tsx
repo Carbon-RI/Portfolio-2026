@@ -40,12 +40,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const isAdmin = adminSession.success;
   const project = projectResult.data;
 
-  // 未公開・詳細非表示のプロジェクトは管理者以外 404
   if (!isAdmin && (!project.published || !project.showDetail)) {
     notFound();
   }
 
-  // 管理者はドラフトをマージした最新データを表示
   const processedProject = isAdmin ? mergeProjectAndDraft(project) : project;
 
   return (

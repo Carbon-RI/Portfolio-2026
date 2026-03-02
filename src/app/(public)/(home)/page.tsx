@@ -38,7 +38,6 @@ export default async function Home() {
     ? await getAllProjects()
     : await getPublishedProjects();
 
-  // 管理者は生データを渡す（getAdminCardData でマージ・status 付与）
   const projects = projectsResult.success ? projectsResult.data : [];
 
   const profileSettings = profileResult.success

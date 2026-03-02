@@ -239,10 +239,11 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     ): Promise<Result<void>> => {
       if (isUploading) return failure("Uploading in progress...");
 
-      // blob: URL が残っている場合はアップロード未完了なので除去してから保存
       const dataToSave = {
         ...draftData,
-        imageSrc: draftData.imageSrc?.startsWith("blob:") ? "" : draftData.imageSrc,
+        imageSrc: draftData.imageSrc?.startsWith("blob:")
+          ? ""
+          : draftData.imageSrc,
       };
 
       const validation = projectSchema.safeParse(dataToSave);

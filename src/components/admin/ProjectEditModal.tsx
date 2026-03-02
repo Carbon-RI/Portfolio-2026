@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-} from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { FullProjectData, ProjectStatus } from "@/types";
@@ -67,8 +62,11 @@ export const ProjectEditModal = ({
   );
 
   const handleClose = useCallback(async () => {
-    // 一度も保存せずに閉じた新規プロジェクトは物理削除する
-    if (!hasSavedDuringSession && !initialProject.slug && !initialProject.published) {
+    if (
+      !hasSavedDuringSession &&
+      !initialProject.slug &&
+      !initialProject.published
+    ) {
       await onCancelNew(initialProject.id);
       onProjectDataChange();
     }
@@ -109,7 +107,12 @@ export const ProjectEditModal = ({
   const editorStatus: ProjectStatus = useMemo(() => {
     const isNew = !initialProject.slug && !initialProject.published;
     return getEditorStatus(draftData, isNew, hasSavedDuringSession);
-  }, [draftData, initialProject.slug, initialProject.published, hasSavedDuringSession]);
+  }, [
+    draftData,
+    initialProject.slug,
+    initialProject.published,
+    hasSavedDuringSession,
+  ]);
 
   const statusDisplay = useMemo(() => {
     const config: Record<ProjectStatus, { label: string; className: string }> =
@@ -189,7 +192,8 @@ export const ProjectEditModal = ({
                 handleImageUpload={handleImageUpload}
                 onNavigateToDetail={async () => {
                   const targetSlug = await executeAction("draft");
-                  if (targetSlug) router.push(`/projects/${targetSlug}?edit=true`);
+                  if (targetSlug)
+                    router.push(`/projects/${targetSlug}?edit=true`);
                 }}
               />
             </ErrorBoundary>
@@ -199,7 +203,10 @@ export const ProjectEditModal = ({
             <button
               onClick={() => setConfirmState({ isOpen: true, mode: "delete" })}
               className="text-xs-mono text-accent-2 px-4 py-2 hover:bg-accent-2/5 transition-all disabled:opacity-30"
-              disabled={(!initialProject.slug && !initialProject.published) || isUploading}
+              disabled={
+                (!initialProject.slug && !initialProject.published) ||
+                isUploading
+              }
             >
               [ Delete ]
             </button>
