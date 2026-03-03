@@ -1,13 +1,12 @@
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
 import { Metadata } from "next";
-import { verifyAdminSession } from "@/services/server/auth-service";
-import {
-  getPublishedProjects,
-  getAllProjects,
-} from "@/services/server/project-service";
+import { getPublishedProjects } from "@/services/server/project-service";
 import { getProfileSettings } from "@/services/server/profile-service";
 import { defaultSettings } from "@/types/index";
+import { SplitLayoutServer } from "@/components/layout/SplitLayoutServer";
+import { HeroSection } from "./_components/HeroSection";
+import { HeroVisibilityController } from "./_components/HeroVisibilityController";
+import { HomeLeftPanelWithObserver } from "./_components/HomeLeftPanelWithObserver";
+import { HomeRightContent } from "./_components/HomeRightContent";
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await getProfileSettings();
@@ -21,36 +20,38 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const HomeClient = dynamic(
-  () => import("./_components/HomeClient").then((mod) => mod.HomeClient),
-  { ssr: true }
-);
-
 export default async function Home() {
-  const [adminSession, profileResult] = await Promise.all([
-    verifyAdminSession(),
+  const [profileResult, projectsResult] = await Promise.all([
     getProfileSettings(),
+    getPublishedProjects(),
   ]);
-
-  const isAdmin = adminSession.success;
-
-  const projectsResult = isAdmin
-    ? await getAllProjects()
-    : await getPublishedProjects();
-
-  const projects = projectsResult.success ? projectsResult.data : [];
 
   const profileSettings = profileResult.success
     ? profileResult.data
     : defaultSettings;
+  const projects = projectsResult.success ? projectsResult.data : [];
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-base-bg" />}>
-      <HomeClient
-        projects={projects}
-        profileSettings={profileSettings}
-        isAdmin={isAdmin}
-      />
-    </Suspense>
+    <SplitLayoutServer
+      hideLeftOnMobile={true}
+      left={
+        <HomeLeftPanelWithObserver profileSettings={profileSettings} />
+      }
+      right={
+        <>
+          {/* Hero: Server-rendered, minimal Client wrapper only for admin hide */}
+          <HeroVisibilityController>
+            <HeroSection
+              welcomeMessageHeading={profileSettings.welcomeMessageHeading ?? ""}
+              welcomeMessageText={profileSettings.welcomeMessageText ?? ""}
+            />
+          </HeroVisibilityController>
+          <HomeRightContent
+            profileSettings={profileSettings}
+            projects={projects}
+          />
+        </>
+      }
+    />
   );
 }

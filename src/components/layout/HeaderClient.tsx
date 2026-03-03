@@ -3,14 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import { LG_QUERY, SCROLL_CONFIG, type SectionId } from "@/types";
 
 interface HeaderClientProps {
-  isAdmin: boolean;
   sections: readonly SectionId[];
 }
 
-export function HeaderClient({ isAdmin, sections }: HeaderClientProps) {
+export function HeaderClient({ sections }: HeaderClientProps) {
+  const { isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState<SectionId>("welcome");
   const router = useRouter();

@@ -5,10 +5,10 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useRef,
   ReactNode,
 } from "react";
 import type { User, Unsubscribe } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase/client";
 
 interface AuthContextType {
   user: User | null;
@@ -18,21 +18,47 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Defer Firebase init until after first paint (requestIdleCallback).
+ * Firebase auth/iframe.js was blocking the critical path (412ms, 90KB).
+ * @returns cleanup function
+ */
+function deferAfterLCP(fn: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  let id: number | ReturnType<typeof setTimeout>;
+  if ("requestIdleCallback" in window) {
+    id = (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(fn, { timeout: 800 });
+  } else {
+    id = setTimeout(fn, 100);
+  }
+  return () => {
+    if ("cancelIdleCallback" in window) {
+      (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id as number);
+    } else {
+      clearTimeout(id as ReturnType<typeof setTimeout>);
+    }
+  };
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const unsubRef = useRef<Unsubscribe | null>(null);
 
   useEffect(() => {
-    let unsubscribe: Unsubscribe;
     let isMounted = true;
+    let loadCleanup: (() => void) | undefined;
 
     const initAuth = async () => {
       try {
-        const { onAuthStateChanged } = await import("firebase/auth");
+        const [{ getFirebaseAuth }, { onAuthStateChanged }] = await Promise.all([
+          import("@/lib/firebase/client").then((m) => ({ getFirebaseAuth: m.getFirebaseAuth })),
+          import("firebase/auth"),
+        ]);
         const auth = getFirebaseAuth();
 
-        unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        unsubRef.current = onAuthStateChanged(auth, async (currentUser) => {
           if (!isMounted) return;
           setUser(currentUser);
 
@@ -51,10 +77,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    initAuth();
+    loadCleanup = deferAfterLCP(initAuth);
+
     return () => {
       isMounted = false;
-      if (unsubscribe) unsubscribe();
+      loadCleanup?.();
+      unsubRef.current?.();
     };
   }, []);
 

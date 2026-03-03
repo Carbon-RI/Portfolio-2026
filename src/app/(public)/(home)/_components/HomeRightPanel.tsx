@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState, Suspense, lazy } from "react";
+import dynamic from "next/dynamic";
 import { FullProjectData, ProfileSettings } from "@/types/index";
 import { getAdminCardData } from "@/services/utils/project-converter";
 import {
@@ -9,7 +10,6 @@ import {
   EmailIcon,
 } from "@/components/shared/SocialIcons";
 import { ContactModal } from "@/components/shared/ContactModal";
-import { ProjectListSection } from "@/components/public/ProjectListSection";
 import type { EditableText as EditableTextType } from "@/components/admin/EditableText";
 import { toast } from "sonner";
 
@@ -19,7 +19,17 @@ const EditableText = lazy(() =>
   }))
 ) as unknown as typeof EditableTextType;
 
+const ProjectListSection = dynamic(
+  () =>
+    import("@/components/public/ProjectListSection").then((mod) => ({
+      default: mod.ProjectListSection,
+    })),
+  { ssr: true }
+);
+
 interface HomeRightPanelProps {
+  /** When true, renders editable Welcome section. When false, Hero is rendered by Server as sibling. */
+  includeWelcomeSection?: boolean;
   projects: FullProjectData[];
   profileSettings: ProfileSettings;
   isAdmin: boolean;
@@ -29,6 +39,7 @@ interface HomeRightPanelProps {
 }
 
 export const HomeRightPanel = ({
+  includeWelcomeSection = false,
   projects,
   profileSettings,
   isAdmin,
@@ -68,20 +79,20 @@ export const HomeRightPanel = ({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Welcome Section */}
-      <section
-        id="welcome"
-        aria-label="Welcome Section"
-        className="section-view-no-py flex items-center shrink-0 min-h-section lg:min-h-0 lg:h-full scroll-mt-(--header-height) lg:scroll-mt-0"
-        style={
-          {
-            contentVisibility: "visible",
-            contain: "content",
-          } as React.CSSProperties
-        }
-      >
-        <div className="max-w-2xl mx-auto px-4 lg:px-6 w-full py-8 lg:py-12">
-          {isAdmin ? (
+      {/* Welcome Section - only when isAdmin (editable). For !isAdmin, Hero is Server sibling. */}
+      {includeWelcomeSection && (
+        <section
+          id="welcome"
+          aria-label="Welcome Section"
+          className="section-view-no-py flex items-center shrink-0 min-h-section lg:min-h-0 lg:h-full scroll-mt-(--header-height) lg:scroll-mt-0"
+          style={
+            {
+              contentVisibility: "visible",
+              contain: "content",
+            } as React.CSSProperties
+          }
+        >
+          <div className="max-w-2xl mx-auto px-4 lg:px-6 w-full py-8 lg:py-12">
             <Suspense
               fallback={
                 <div className="h-10 w-48 animate-pulse bg-layer-faint rounded mb-6" />
@@ -104,18 +115,9 @@ export const HomeRightPanel = ({
                 className="text-base md:text-lg font-light text-content-secondary whitespace-pre-wrap leading-relaxed"
               />
             </Suspense>
-          ) : (
-            <>
-              <h2 className="text-2xl md:text-3xl mb-6 text-content-primary">
-                {profileSettings.welcomeMessageHeading}
-              </h2>
-              <p className="text-base md:text-lg font-light text-content-secondary whitespace-pre-wrap leading-relaxed">
-                {profileSettings.welcomeMessageText}
-              </p>
-            </>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Profile Section */}
       <section

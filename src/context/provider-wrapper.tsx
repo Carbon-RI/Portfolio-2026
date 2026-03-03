@@ -3,13 +3,9 @@ import { ReactNode } from "react";
 
 interface ProviderWrapperProps {
   children: ReactNode;
-  isAdmin: boolean;
 }
 
-export function ProviderWrapper({ children, isAdmin }: ProviderWrapperProps) {
-  if (!isAdmin) {
-    return <>{children}</>;
-  }
-
+/** Always wraps with AuthProvider so isAdmin is resolved client-side. Enables static rendering. */
+export function ProviderWrapper({ children }: ProviderWrapperProps) {
   return <AuthProvider>{children}</AuthProvider>;
 }
