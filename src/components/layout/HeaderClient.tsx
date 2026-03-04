@@ -39,17 +39,21 @@ export function HeaderClient({ sections }: HeaderClientProps) {
     for (const id of sections) {
       const el = document.getElementById(id);
       if (el) {
-        const { offsetTop, offsetHeight } = el;
-        if (
-          scrollPosition >= offsetTop &&
-          scrollPosition < offsetTop + offsetHeight
-        ) {
-          if (id !== activeNav) setActiveNav(id);
+        const rect = el.getBoundingClientRect();
+        const top = rect.top + window.scrollY;
+        const height = rect.height;
+        if (scrollPosition >= top && scrollPosition < top + height) {
+          setActiveNav(id);
           break;
         }
       }
     }
-  }, [activeNav, sections]);
+  }, [sections]);
+
+  const handleResize = useCallback(() => {
+    updateHeaderHeight();
+    handleScroll();
+  }, [updateHeaderHeight, handleScroll]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -57,14 +61,16 @@ export function HeaderClient({ sections }: HeaderClientProps) {
     matchMediaRef.current = window.matchMedia(LG_QUERY);
     updateHeaderHeight();
 
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", updateHeaderHeight, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", updateHeaderHeight);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [handleScroll, updateHeaderHeight]);
+  }, [handleScroll, handleResize, updateHeaderHeight]);
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,

@@ -23,13 +23,16 @@ export function HomeLeftPanelWithObserver({
     const scrollEl = document.getElementById(MAIN_SCROLL_ID);
     if (!scrollEl) return;
 
+    const observedIds = new Set<string>();
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id as SectionId);
-          }
-        });
+        const intersecting = entries.filter((e) => e.isIntersecting);
+        if (intersecting.length === 0) return;
+        const best = intersecting.reduce((a, b) =>
+          (a.intersectionRatio ?? 0) >= (b.intersectionRatio ?? 0) ? a : b
+        );
+        setActiveSection(best.target.id as SectionId);
       },
       {
         root: scrollEl,
@@ -38,14 +41,28 @@ export function HomeLeftPanelWithObserver({
       }
     );
 
-    const sections = scrollEl.querySelectorAll("section[id]");
-    sections.forEach((section) => {
-      if (SECTIONS.includes(section.id as SectionId)) {
-        observer.observe(section);
-      }
-    });
+    const observeSections = () => {
+      const sections = scrollEl.querySelectorAll("section[id]");
+      sections.forEach((section) => {
+        if (
+          SECTIONS.includes(section.id as SectionId) &&
+          !observedIds.has(section.id)
+        ) {
+          observedIds.add(section.id);
+          observer.observe(section);
+        }
+      });
+    };
 
-    return () => observer.disconnect();
+    observeSections();
+
+    const mutationObserver = new MutationObserver(observeSections);
+    mutationObserver.observe(scrollEl, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return (
