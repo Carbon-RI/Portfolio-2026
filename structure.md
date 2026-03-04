@@ -513,6 +513,7 @@ getProjectStatus(project):
 
 | 変数名 | 用途 |
 |--------|------|
+| `NEXT_PUBLIC_SITE_URL` | 本番URL。robots.txt / sitemap.xml / canonical に使用。.env.local で指定 |
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Client SDK |
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase Client SDK |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase Client SDK |

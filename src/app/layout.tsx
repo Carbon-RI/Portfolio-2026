@@ -4,6 +4,12 @@ import "./globals.css";
 import { defaultSettings } from "@/types/index";
 import { Toaster } from "sonner";
 
+function getMetadataBase(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL;
+  if (url) return url.replace(/\/$/, "");
+  return "http://localhost:3000";
+}
+
 const oswald = Oswald({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -37,6 +43,7 @@ const jetbrains = JetBrains_Mono({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
   themeColor: "#000000",
 };
 
@@ -54,18 +61,38 @@ export async function generateMetadata(): Promise<Metadata> {
       settings.siteDescription || "Welcome to my creative portfolio.";
 
     return {
+      metadataBase: new URL(getMetadataBase()),
       title: {
         default: title,
         template: `%s | ${title}`,
       },
       description: description,
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+        },
+      },
+      openGraph: {
+        type: "website",
+      },
     };
   } catch (error) {
     console.error("[Layout Metadata Error]:", error);
     return {
+      metadataBase: new URL(getMetadataBase()),
       title: "My Portfolio",
       description:
         "A professional portfolio showcasing my projects and skills.",
+      robots: {
+        index: true,
+        follow: true,
+      },
+      openGraph: {
+        type: "website",
+      },
     };
   }
 }

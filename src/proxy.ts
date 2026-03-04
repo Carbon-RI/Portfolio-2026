@@ -13,6 +13,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/robots.txt" || pathname === "/sitemap.xml") {
+    return NextResponse.next();
+  }
+
   const VALID_ROOTS = ["/", "/projects", "/api"];
   const isKnownRoute = VALID_ROOTS.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
