@@ -131,7 +131,6 @@
     }
   }
 
-  /* 600–800px: 画像高を 100px→280px に線形スケール（600px で全体収まるよう控えめに） */
   @media (min-width: 1024px) and (min-height: 600px) and (max-height: 799px) {
     :root {
       --project-card-image-height: clamp(
@@ -147,7 +146,6 @@
     }
   }
 
-  /* 600px 未満: 画像最小・Gap 最小でカード全体を表示 */
   @media (min-width: 1024px) and (max-height: 599px) {
     :root {
       --project-card-image-height: 100px;
