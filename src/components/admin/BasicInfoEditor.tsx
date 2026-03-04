@@ -176,6 +176,37 @@ export const BasicInfoEditor = ({
         />
       </div>
 
+      {/* Links: Site (demo) URL and GitHub (code) URL — shown on ProjectCard */}
+      <div className="space-y-4">
+        <span className="app-label block">Links</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-xs uppercase tracking-widest text-layer-muted ml-1">
+              Site URL (Demo)
+            </label>
+            <input
+              type="url"
+              value={draftData.demoUrl || ""}
+              onChange={(e) => handleFieldChange("demoUrl", e.target.value)}
+              className="app-input-full font-mono text-sm"
+              placeholder="https://..."
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-xs uppercase tracking-widest text-layer-muted ml-1">
+              GitHub URL (Code)
+            </label>
+            <input
+              type="url"
+              value={draftData.githubUrl || ""}
+              onChange={(e) => handleFieldChange("githubUrl", e.target.value)}
+              className="app-input-full font-mono text-sm"
+              placeholder="https://github.com/..."
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         <div className="md:col-span-5 space-y-4">
           <span className="app-label block">Cover Image</span>

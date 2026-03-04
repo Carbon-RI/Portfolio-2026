@@ -1,76 +1,72 @@
 import { IconType } from "react-icons";
+import { FaAws, FaDocker, FaPython, FaGitAlt, FaNodeJs } from "react-icons/fa";
 import {
-  FaReact,
-  FaAws,
-  FaDocker,
-  FaPython,
-  FaGitAlt,
-  FaNodeJs,
-  FaGithub,
-  FaDatabase,
-} from "react-icons/fa";
-import {
+  SiReact,
   SiNextdotjs,
   SiTypescript,
   SiTailwindcss,
-  SiMongodb,
-  SiFirebase,
-  SiExpress,
-  SiJira,
+  SiShadcnui,
+  SiNestjs,
+  SiGo,
+  SiGraphql,
   SiPostgresql,
-  SiPrisma,
+  SiMongodb,
   SiSupabase,
-  SiVercel,
-  SiVite,
+  SiFirebase,
+  SiPrisma,
   SiRedis,
-  SiGooglecloud,
   SiOpenai,
   SiAnthropic,
+  SiGooglecloud,
+  SiVercel,
+  SiVite,
+  SiJest,
+  SiZod,
   SiFigma,
-  SiFramer,
-  SiShadcnui,
-  SiStorybook,
-  SiGo,
-  SiNestjs,
-  SiGraphql,
-  SiMysql,
-  SiElasticsearch,
   SiPostman,
 } from "react-icons/si";
 
+/** Tech stack icons. Categories for reference:
+ * Frontend: React, Next.js, TypeScript, Tailwind CSS, shadcn/ui
+ * Backend: NestJS, Node.js, Go, Python, GraphQL
+ * Database: PostgreSQL, MongoDB, Supabase, Firebase, Prisma, Redis
+ * AI: OpenAI, Anthropic
+ * Infra: AWS, Google Cloud, Docker, Vercel
+ * Tools: Vite, Jest, Zod, Git, Figma, Postman
+ */
 export const TechIconMap = {
-  FaReact,
+  // Frontend
+  SiReact,
   SiNextdotjs,
   SiTypescript,
   SiTailwindcss,
-  SiVite,
-  SiFramer,
   SiShadcnui,
-  SiStorybook,
-  FaNodeJs,
-  SiExpress,
+  // Backend
   SiNestjs,
-  FaPython,
+  FaNodeJs,
   SiGo,
-  SiPrisma,
+  FaPython,
   SiGraphql,
-  FaDatabase,
-  SiMongodb,
-  SiFirebase,
+  // Database
   SiPostgresql,
-  SiMysql,
+  SiMongodb,
   SiSupabase,
+  SiFirebase,
+  SiPrisma,
   SiRedis,
-  SiElasticsearch,
-  FaAws,
-  SiGooglecloud,
+  // AI
   SiOpenai,
   SiAnthropic,
+  // Infra
+  FaAws,
+  SiGooglecloud,
   FaDocker,
-  FaGitAlt,
-  SiJira,
   SiVercel,
-  FaGithub,
+  // Tools
+  SiVite,
+  SiJest,
+  SiZod,
+  FaGitAlt,
   SiFigma,
   SiPostman,
 } as const satisfies Record<string, IconType>;
