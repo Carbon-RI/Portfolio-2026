@@ -1,12 +1,10 @@
 import {
-  getDb,
   getFirebaseStorage,
   getFirebaseApp,
 } from "@/lib/firebase/client";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   FullProjectData,
-  ProjectCardData,
   Result,
   success,
   failure,
@@ -27,6 +25,23 @@ export const uploadImageToStorage = async (
     return success(downloadUrl);
   } catch (error) {
     return failure(error instanceof Error ? error : "Failed to upload image");
+  }
+};
+
+export const uploadVideoToStorage = async (
+  projectId: string,
+  file: File
+): Promise<Result<string>> => {
+  try {
+    const storage = getFirebaseStorage();
+    const baseName = file.name.replace(/\.[^/.]+$/, "") || "video";
+    const fileName = `${Date.now()}_${baseName}.mp4`;
+    const storageRef = ref(storage, `projects/${projectId}/videos/${fileName}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadUrl = await getDownloadURL(snapshot.ref);
+    return success(downloadUrl);
+  } catch (error) {
+    return failure(error instanceof Error ? error : "Failed to upload video");
   }
 };
 
@@ -61,7 +76,7 @@ export const getProjectDataClient = async (
 };
 
 export const getPublishedProjectsClient = async (): Promise<
-  ProjectCardData[]
+  FullProjectData[]
 > => {
   const { getFirestore, collection, query, where, getDocs } = await import(
     "firebase/firestore"
@@ -70,6 +85,19 @@ export const getPublishedProjectsClient = async (): Promise<
   const q = query(
     collection(db, FB_COLLECTIONS.PROJECTS),
     where("published", "==", true),
+    where("is_deleted", "==", false)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => mapToFullData(d.id, d.data()));
+};
+
+export const getAllProjectsClient = async (): Promise<FullProjectData[]> => {
+  const { getFirestore, collection, query, where, getDocs } = await import(
+    "firebase/firestore"
+  );
+  const db = getFirestore(getFirebaseApp());
+  const q = query(
+    collection(db, FB_COLLECTIONS.PROJECTS),
     where("is_deleted", "==", false)
   );
   const snap = await getDocs(q);

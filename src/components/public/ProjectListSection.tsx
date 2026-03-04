@@ -2,10 +2,10 @@
 
 import React, { useCallback } from "react";
 import { ProjectCard } from "@/components/public/ProjectCard";
-import { ProjectCardData, FullProjectData } from "@/types";
+import { FullProjectData } from "@/types";
 
 interface ProjectListSectionProps {
-  projects: ProjectCardData[];
+  projects: FullProjectData[];
   isAdmin: boolean;
   onProjectDataChange: () => void;
   onSelectProject: (project: FullProjectData) => void;

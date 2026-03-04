@@ -46,7 +46,3 @@ export function getAdminDb() {
 export function getAdminStorage() {
   return getStorage(getAdminApp());
 }
-
-export const adminAuth = getAuth(getAdminApp());
-export const adminDb = getFirestore(getAdminApp());
-export const adminStorage = getStorage(getAdminApp());

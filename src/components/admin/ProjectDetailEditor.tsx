@@ -26,6 +26,11 @@ interface ProjectDetailEditorProps {
     mIndex: number,
     file: File
   ) => Promise<void>;
+  handleSectionVideoUpload: (
+    sIndex: number,
+    mIndex: number,
+    file: File
+  ) => Promise<void>;
 }
 
 const MediaItem = ({
@@ -34,14 +39,17 @@ const MediaItem = ({
   onUpdate,
   onRemove,
   onImageUpload,
+  onVideoUpload,
 }: {
   media: ProjectMedia;
   isUploading: boolean;
   onUpdate: (field: keyof ProjectMedia, value: string) => void;
   onRemove: () => void;
   onImageUpload: (file: File) => Promise<void>;
+  onVideoUpload: (file: File) => Promise<void>;
 }) => {
   const isImage = media.type === "image";
+  const isVideo = media.type === "video";
 
   return (
     <div className="bg-base-bg border border-base-border p-4 transition-all duration-normal hover:border-layer-muted group">
@@ -73,14 +81,25 @@ const MediaItem = ({
                   className="hidden"
                 />
               </label>
+            ) : isVideo ? (
+              <label className="shrink-0">
+                <span className="cursor-pointer px-4 py-2 border border-base-border text-xs-mono bg-base-bg text-layer-medium hover:text-content-primary hover:border-content-primary transition-all">
+                  {isUploading ? "Uploading..." : "Select MP4 Video"}
+                </span>
+                <input
+                  type="file"
+                  accept="video/mp4"
+                  disabled={isUploading}
+                  onChange={(e) =>
+                    e.target.files?.[0] && onVideoUpload(e.target.files[0])
+                  }
+                  className="hidden"
+                />
+              </label>
             ) : (
               <input
                 type="text"
-                placeholder={
-                  media.type === "youtube"
-                    ? "Enter YouTube ID"
-                    : "Enter Video URL"
-                }
+                placeholder="Enter YouTube ID or URL"
                 value={media.url}
                 onChange={(e) => onUpdate("url", e.target.value)}
                 className="flex-1 min-w-37.5 bg-base-bg border border-base-border p-2 text-xs text-content-primary focus:border-content-primary outline-hidden"
@@ -120,6 +139,7 @@ const SectionItem = ({
   onAddMedia,
   onRemoveMedia,
   onImageUpload,
+  onVideoUpload,
 }: {
   section: ProjectSection;
   sIndex: number;
@@ -134,6 +154,7 @@ const SectionItem = ({
   onAddMedia: () => void;
   onRemoveMedia: (mIndex: number) => void;
   onImageUpload: (mIndex: number, file: File) => Promise<void>;
+  onVideoUpload: (mIndex: number, file: File) => Promise<void>;
 }) => {
   return (
     <div className="relative p-6 lg:p-10 surface-container border border-transparent focus-within:border-layer-muted transition-all">
@@ -175,6 +196,7 @@ const SectionItem = ({
               onUpdate={(field, value) => onUpdateMedia(mIndex, field, value)}
               onRemove={() => onRemoveMedia(mIndex)}
               onImageUpload={(file) => onImageUpload(mIndex, file)}
+              onVideoUpload={(file) => onVideoUpload(mIndex, file)}
             />
           ))}
 
@@ -200,6 +222,7 @@ export const ProjectDetailEditor = ({
   addMedia,
   removeMedia,
   handleSectionImageUpload,
+  handleSectionVideoUpload,
 }: ProjectDetailEditorProps) => {
   const handleRemoveSection = (index: number) => {
     if (
@@ -215,7 +238,7 @@ export const ProjectDetailEditor = ({
     <div className="space-y-16">
       {sections.map((section, sIndex) => (
         <SectionItem
-          key={`${sIndex}-${section.heading}`}
+          key={`section-${sIndex}`}
           section={section}
           sIndex={sIndex}
           isUploading={isUploading}
@@ -230,6 +253,9 @@ export const ProjectDetailEditor = ({
           onRemoveMedia={(mIndex) => removeMedia(sIndex, mIndex)}
           onImageUpload={(mIndex, file) =>
             handleSectionImageUpload(sIndex, mIndex, file)
+          }
+          onVideoUpload={(mIndex, file) =>
+            handleSectionVideoUpload(sIndex, mIndex, file)
           }
         />
       ))}

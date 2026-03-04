@@ -1,7 +1,5 @@
-import {
-  getPublishedProjects,
-  getProjectData,
-} from "@/services/server/project-service";
+import { getProjectData } from "@/services/server/project-service";
+import { verifyAdminSession } from "@/services/server/auth-service";
 import { mergeProjectAndDraft } from "@/services/utils/project-converter";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -10,17 +8,8 @@ import ProjectContentClient from "./_components/ProjectContentClient";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { Suspense } from "react";
 
-export async function generateStaticParams() {
-  const result = await getPublishedProjects();
-  if (!result.success) return [];
-  return result.data.map((project) => ({
-    slug: project.slug,
-  }));
-}
-
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ edit?: string }>;
 }
 
 export async function generateMetadata({
@@ -36,32 +25,26 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProjectPage({
-  params,
-  searchParams,
-}: ProjectPageProps) {
+export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const { edit } = await searchParams;
 
-  const isAdmin = edit === "true";
+  const [projectResult, adminSession] = await Promise.all([
+    getProjectData(slug),
+    verifyAdminSession(),
+  ]);
 
-  const result = await getProjectData(slug);
-  if (!result.success) {
+  if (!projectResult.success) {
     notFound();
   }
 
-  // 管理者の場合は下書きをマージしたデータを、一般ユーザーは確定データを使用
-  const processedProject = isAdmin
-    ? mergeProjectAndDraft(result.data)
-    : result.data;
+  const isAdmin = adminSession.success;
+  const project = projectResult.data;
 
-  // 管理者でない、かつ「非公開」または「詳細表示オフ」の場合は404
-  if (
-    !isAdmin &&
-    (!processedProject.published || !processedProject.showDetail)
-  ) {
+  if (!isAdmin && (!project.published || !project.showDetail)) {
     notFound();
   }
+
+  const processedProject = isAdmin ? mergeProjectAndDraft(project) : project;
 
   return (
     <ErrorBoundary

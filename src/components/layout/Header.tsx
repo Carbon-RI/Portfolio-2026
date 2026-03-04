@@ -1,14 +1,8 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { HeaderClient } from "./HeaderClient";
 import { SECTIONS } from "@/types";
-import { AUTH_CONFIG } from "@/lib/constants";
 
-export async function Header() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get(AUTH_CONFIG.SESSION_COOKIE);
-  const isAdmin = !!session;
-
+export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-(--header-height) bg-base-bg/90 backdrop-blur-sm header-border flex items-center shadow-sm">
       <div className="container-responsive px-4 lg:px-6 flex items-center justify-between h-full">
@@ -22,7 +16,7 @@ export async function Header() {
             </span>
           </Link>
         </div>
-        <HeaderClient isAdmin={isAdmin} sections={SECTIONS} />
+        <HeaderClient sections={SECTIONS} />
       </div>
     </header>
   );

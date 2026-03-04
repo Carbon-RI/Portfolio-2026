@@ -1,12 +1,7 @@
 "use client";
 
-import React, {
-  useMemo,
-  useState,
-  useCallback,
-  startTransition,
-  useEffect,
-} from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { FullProjectData, ProjectStatus } from "@/types";
 import {
@@ -22,16 +17,16 @@ interface ProjectEditModalProps {
   initialProject: FullProjectData;
   onClose: () => void;
   onDelete: (id: string) => Promise<void>;
-  onProjectDataChange: () => void;
-  isCreatingNew: boolean;
+  onCancelNew: (id: string) => Promise<void>;
+  onProjectDataChange: () => void | Promise<void>;
 }
 
 export const ProjectEditModal = ({
   initialProject,
   onClose,
   onDelete,
+  onCancelNew,
   onProjectDataChange,
-  isCreatingNew,
 }: ProjectEditModalProps) => {
   const router = useRouter();
   const [confirmState, setConfirmState] = useState<{
@@ -43,30 +38,12 @@ export const ProjectEditModal = ({
   const [showSavedText, setShowSavedText] = useState(false);
 
   useEffect(() => {
-    setHasSavedDuringSession(false);
+    queueMicrotask(() => setHasSavedDuringSession(false));
   }, [initialProject.id]);
 
   const baseData = useMemo(() => {
-    if (isCreatingNew) {
-      return {
-        id: initialProject.id,
-        slug: "",
-        title: "",
-        summary: "",
-        githubUrl: "",
-        demoUrl: "",
-        industry: "",
-        category: [],
-        techStack: [],
-        imageSrc: "",
-        sections: [],
-        published: false,
-        is_deleted: false,
-        showDetail: false,
-      };
-    }
     return mergeProjectAndDraft(initialProject);
-  }, [initialProject, isCreatingNew]);
+  }, [initialProject]);
 
   const {
     draftData,
@@ -85,51 +62,57 @@ export const ProjectEditModal = ({
   );
 
   const handleClose = useCallback(async () => {
-    if (isCreatingNew && !hasSavedDuringSession) {
-      await onDelete(initialProject.id);
+    if (
+      !hasSavedDuringSession &&
+      !initialProject.slug &&
+      !initialProject.published
+    ) {
+      await onCancelNew(initialProject.id);
       onProjectDataChange();
     }
     onClose();
   }, [
-    isCreatingNew,
     hasSavedDuringSession,
-    onDelete,
+    initialProject.slug,
+    initialProject.published,
+    onCancelNew,
     initialProject.id,
     onProjectDataChange,
     onClose,
   ]);
 
   const executeAction = useCallback(
-    async (mode: "draft" | "publish") => {
-      try {
-        const targetSlug = await new Promise<string>((resolve, reject) => {
-          save(mode, (slug) => {
-            startTransition(() => {
-              onProjectDataChange();
-            });
-            resolve(slug);
-          }).catch(reject);
-        });
-
-        if (mode === "publish") {
-          onClose();
-        } else {
-          setHasSavedDuringSession(true);
-          setShowSavedText(true);
-          setTimeout(() => setShowSavedText(false), 2000);
-        }
-        return targetSlug;
-      } catch (error) {
-        console.error("Action failed:", error);
-        throw error;
+    async (mode: "draft" | "publish"): Promise<string | null> => {
+      const result = await save(mode);
+      if (!result.success) {
+        toast.error(result.error.message);
+        return null;
       }
+
+      await onProjectDataChange();
+
+      if (mode === "publish") {
+        onClose();
+      } else {
+        setHasSavedDuringSession(true);
+        setShowSavedText(true);
+        setTimeout(() => setShowSavedText(false), 2000);
+      }
+
+      return draftData.slug;
     },
-    [save, onProjectDataChange, onClose]
+    [save, onProjectDataChange, onClose, draftData.slug]
   );
 
   const editorStatus: ProjectStatus = useMemo(() => {
-    return getEditorStatus(draftData, isCreatingNew, hasSavedDuringSession);
-  }, [draftData, isCreatingNew, hasSavedDuringSession]);
+    const isNew = !initialProject.slug && !initialProject.published;
+    return getEditorStatus(draftData, isNew, hasSavedDuringSession);
+  }, [
+    draftData,
+    initialProject.slug,
+    initialProject.published,
+    hasSavedDuringSession,
+  ]);
 
   const statusDisplay = useMemo(() => {
     const config: Record<ProjectStatus, { label: string; className: string }> =
@@ -161,7 +144,7 @@ export const ProjectEditModal = ({
           <header className="modal-header border-b border-base-border/50">
             <div className="flex flex-col">
               <h2 className="text-sm-mono text-layer-medium truncate max-w-100">
-                {isCreatingNew
+                {!initialProject.slug && !initialProject.published
                   ? "Create New Project"
                   : `Editing / ${initialProject.title}`}
               </h2>
@@ -209,7 +192,8 @@ export const ProjectEditModal = ({
                 handleImageUpload={handleImageUpload}
                 onNavigateToDetail={async () => {
                   const targetSlug = await executeAction("draft");
-                  router.push(`/projects/${targetSlug}?edit=true`);
+                  if (targetSlug)
+                    router.push(`/projects/${targetSlug}?edit=true`);
                 }}
               />
             </ErrorBoundary>
@@ -219,7 +203,10 @@ export const ProjectEditModal = ({
             <button
               onClick={() => setConfirmState({ isOpen: true, mode: "delete" })}
               className="text-xs-mono text-accent-2 px-4 py-2 hover:bg-accent-2/5 transition-all disabled:opacity-30"
-              disabled={isCreatingNew || isUploading}
+              disabled={
+                (!initialProject.slug && !initialProject.published) ||
+                isUploading
+              }
             >
               [ Delete ]
             </button>
@@ -245,7 +232,7 @@ export const ProjectEditModal = ({
                 disabled={
                   isUploading ||
                   !isSlugValid ||
-                  (!isCreatingNew && initialProject.published && !isDirty)
+                  (draftData.published && !isDirty)
                 }
               >
                 Publish Now

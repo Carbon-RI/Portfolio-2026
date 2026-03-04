@@ -15,7 +15,7 @@ import { extractYouTubeId } from "@/services/utils/project-formatter";
 
 // --- Types for Reducer ---
 type ProjectAction =
-  | { type: "SET_FIELD"; field: keyof FullProjectData; value: any }
+  | { type: "SET_FIELD"; field: keyof FullProjectData; value: unknown }
   | { type: "TOGGLE_TECH"; techKey: TechIconKey }
   | { type: "ADD_SECTION" }
   | { type: "REMOVE_SECTION"; sIndex: number }
@@ -23,7 +23,7 @@ type ProjectAction =
       type: "UPDATE_SECTION_FIELD";
       sIndex: number;
       field: keyof ProjectSection;
-      value: any;
+      value: unknown;
     }
   | { type: "ADD_MEDIA"; sIndex: number }
   | { type: "REMOVE_MEDIA"; sIndex: number; mIndex: number }
@@ -103,14 +103,12 @@ function projectReducer(
             ...s,
             media: (s.media || []).map((m, j) => {
               if (j !== action.mIndex) return m;
-              const isVideoType =
-                action.field === "url" &&
-                (m.type === "video" || m.type === "youtube");
+              const isYoutubeUrl =
+                action.field === "url" && m.type === "youtube";
               return {
                 ...m,
-                [action.field]: isVideoType
-                  ? extractYouTubeId(action.value)
-                  : action.value,
+                [action.field]:
+                  isYoutubeUrl ? extractYouTubeId(action.value) : action.value,
               };
             }),
           };
@@ -126,7 +124,10 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
   const [draftData, dispatch] = useReducer(
     projectReducer,
     initialProject,
-    (p) => projectSchema.parse(p) as FullProjectData
+    (p) => {
+      const result = projectSchema.safeParse(p);
+      return result.success ? (result.data as FullProjectData) : p;
+    }
   );
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(
@@ -149,7 +150,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
   );
 
   const handleFieldChange = useCallback(
-    (field: keyof FullProjectData, value: any) =>
+    (field: keyof FullProjectData, value: unknown) =>
       dispatch({ type: "SET_FIELD", field, value }),
     []
   );
@@ -163,7 +164,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     []
   );
   const updateSectionField = useCallback(
-    (sIndex: number, field: keyof ProjectSection, value: any) =>
+    (sIndex: number, field: keyof ProjectSection, value: unknown) =>
       dispatch({ type: "UPDATE_SECTION_FIELD", sIndex, field, value }),
     []
   );
@@ -203,7 +204,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
         } else {
           setPreviewUrl(initialProject.imageSrc);
         }
-      } catch (error) {
+      } catch {
         setPreviewUrl(initialProject.imageSrc);
       } finally {
         setIsUploading(false);
@@ -229,13 +230,38 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     [draftData.id, updateMedia]
   );
 
+  const handleSectionVideoUpload = useCallback(
+    async (sIndex: number, mIndex: number, file: File) => {
+      if (!draftData.id) return;
+      setIsUploading(true);
+      try {
+        const { uploadVideoToStorage } = await import(
+          "@/services/client/project-service"
+        );
+        const result = await uploadVideoToStorage(draftData.id, file);
+        if (result.success) updateMedia(sIndex, mIndex, "url", result.data);
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [draftData.id, updateMedia]
+  );
+
   const save = useCallback(
     async (
       mode: "draft" | "publish",
       onSuccess?: (slug: string) => void
     ): Promise<Result<void>> => {
       if (isUploading) return failure("Uploading in progress...");
-      const validation = projectSchema.safeParse(draftData);
+
+      const dataToSave = {
+        ...draftData,
+        imageSrc: draftData.imageSrc?.startsWith("blob:")
+          ? ""
+          : draftData.imageSrc,
+      };
+
+      const validation = projectSchema.safeParse(dataToSave);
       if (!validation.success)
         return failure(validation.error.issues[0]?.message || "Invalid data");
 
@@ -252,8 +278,8 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
         );
         const result =
           mode === "draft"
-            ? await saveProjectDraft(id, contentFields as any)
-            : await publishProject(id, contentFields as any);
+            ? await saveProjectDraft(id, contentFields as Partial<FullProjectData>)
+            : await publishProject(id, contentFields as Partial<FullProjectData>);
 
         if (result.success && onSuccess) onSuccess(slug);
         return result.success
@@ -281,6 +307,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     addMedia,
     removeMedia,
     handleSectionImageUpload,
+    handleSectionVideoUpload,
     save,
   };
 };

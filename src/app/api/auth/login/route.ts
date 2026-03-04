@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminAuth } from "@/lib/firebase/admin";
+import { getAdminAuth } from "@/lib/firebase/admin";
 import {
   createSessionCookie,
   getRegisteredAdminUid,
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const decodedToken = await getAdminAuth().verifyIdToken(idToken);
 
     if (!ADMIN_EMAIL || decodedToken.email !== ADMIN_EMAIL) {
       console.error(`Unauthorized email: ${decodedToken.email}`);

@@ -1,6 +1,5 @@
 import { TechIconKey } from "@/services/utils/tech-icons";
 import {
-  ProjectCardData,
   FullProjectData,
   ProjectStatus,
   ProjectSection,
@@ -33,7 +32,7 @@ export const mapToFullData = (
   id: string,
   data: Record<string, unknown>
 ): FullProjectData => {
-  const showDetailValue = (data.showDetail as boolean) ?? false;
+  const showDetailValue = (data.showDetail as boolean) ?? true;
   const ensureCategoryArray = (cat: unknown): string[] => {
     if (Array.isArray(cat)) return cat.map(String);
     if (typeof cat === "string" && cat.length > 0) return [cat];
@@ -81,20 +80,25 @@ export const mapToFullData = (
 export const mergeProjectAndDraft = (
   project: FullProjectData
 ): FullProjectData => {
-  if (!project.draft) return project;
+  if (!project.draft) {
+    const { draft, ...rest } = project;
+    void draft;
+    return rest as FullProjectData;
+  }
+  const { draft, ...base } = project;
   return {
-    ...project,
-    ...project.draft,
-    category: project.draft.category ?? project.category,
-    techStack: project.draft.techStack ?? project.techStack,
-    sections: project.draft.sections ?? project.sections,
+    ...base,
+    ...draft,
+    category: draft.category ?? base.category,
+    techStack: draft.techStack ?? base.techStack,
+    sections: draft.sections ?? base.sections,
   };
 };
 
 export const getAdminCardData = (
-  project: ProjectCardData,
+  project: FullProjectData,
   isAdmin: boolean
-): ProjectCardData & { status: ProjectStatus } => {
+): FullProjectData & { status: ProjectStatus } => {
   if (!isAdmin) return { ...project, status: "Published" };
   const status = getProjectStatus(project);
   const base = project.draft ? { ...project, ...project.draft } : project;

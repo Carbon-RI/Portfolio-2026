@@ -28,9 +28,24 @@ export const profileSettingsSchema = z.object({
 });
 
 // --- Project Helper Schemas ---
+const isValidUrlOrYouTubeId = (val: string): boolean => {
+  if (!val) return true;
+  try {
+    new URL(val);
+    return true;
+  } catch {
+    return /^[A-Za-z0-9_-]{11}$/.test(val);
+  }
+};
+
 export const projectMediaSchema = z.object({
   type: z.enum(["image", "video", "youtube"]),
-  url: z.string().url("Please enter a valid media URL"),
+  url: z
+    .string()
+    .refine(
+      isValidUrlOrYouTubeId,
+      "Please enter a valid URL or YouTube video ID"
+    ),
 });
 
 export const projectSectionSchema = z.object({

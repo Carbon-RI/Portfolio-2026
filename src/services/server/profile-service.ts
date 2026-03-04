@@ -13,9 +13,9 @@ import {
 } from "@/types/index";
 import { FB_COLLECTIONS, FB_DOCS } from "@/lib/constants";
 import { profileSettingsSchema } from "@/lib/validation/schemas";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
-export async function getProfileSettings(): Promise<Result<ProfileSettings>> {
+async function fetchProfileSettings(): Promise<Result<ProfileSettings>> {
   try {
     const docSnap = await getAdminDb()
       .collection(FB_COLLECTIONS.SETTINGS)
@@ -30,6 +30,12 @@ export async function getProfileSettings(): Promise<Result<ProfileSettings>> {
     return failure(error instanceof Error ? error : "Failed to fetch profile");
   }
 }
+
+export const getProfileSettings = unstable_cache(
+  fetchProfileSettings,
+  ["profile-settings"],
+  { revalidate: 60, tags: ["profile-settings"] }
+);
 
 export async function saveProfileSettings(
   data: Partial<ProfileSettings>
@@ -48,6 +54,7 @@ export async function saveProfileSettings(
 
     revalidatePath("/");
     revalidatePath("/admin/profile");
+    revalidateTag("profile-settings", "max");
     return success(undefined);
   } catch (error) {
     console.error("Profile Save Error:", error);

@@ -1,4 +1,4 @@
-import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
 import { cookies } from "next/headers";
 import { Result, success, failure } from "@/types/index";
 import { DecodedIdToken } from "firebase-admin/auth";
@@ -6,7 +6,7 @@ import { FB_COLLECTIONS, FB_DOCS, AUTH_CONFIG } from "@/lib/constants";
 
 export async function getRegisteredAdminUid(): Promise<Result<string>> {
   try {
-    const doc = await adminDb
+    const doc = await getAdminDb()
       .collection(FB_COLLECTIONS.ADMIN_CONFIGS)
       .doc(FB_DOCS.ADMIN_GLOBAL)
       .get();
@@ -39,7 +39,7 @@ export async function verifyAdminSession(): Promise<Result<DecodedIdToken>> {
       return failure<DecodedIdToken>("Session cookie not found.");
     }
 
-    const decodedToken = await adminAuth.verifySessionCookie(
+    const decodedToken = await getAdminAuth().verifySessionCookie(
       sessionCookie,
       true
     );
@@ -69,7 +69,7 @@ export async function createSessionCookie(
   expiresIn: number
 ): Promise<Result<string>> {
   try {
-    const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
       expiresIn,
     });
     return success(sessionCookie);
@@ -83,7 +83,7 @@ export async function createSessionCookie(
 
 export async function revokeSession(uid: string): Promise<Result<void>> {
   try {
-    await adminAuth.revokeRefreshTokens(uid);
+    await getAdminAuth().revokeRefreshTokens(uid);
     return success(undefined);
   } catch (error) {
     console.error("Revoke Session Error:", error);
