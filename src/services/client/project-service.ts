@@ -28,6 +28,23 @@ export const uploadImageToStorage = async (
   }
 };
 
+export const uploadVideoToStorage = async (
+  projectId: string,
+  file: File
+): Promise<Result<string>> => {
+  try {
+    const storage = getFirebaseStorage();
+    const baseName = file.name.replace(/\.[^/.]+$/, "") || "video";
+    const fileName = `${Date.now()}_${baseName}.mp4`;
+    const storageRef = ref(storage, `projects/${projectId}/videos/${fileName}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadUrl = await getDownloadURL(snapshot.ref);
+    return success(downloadUrl);
+  } catch (error) {
+    return failure(error instanceof Error ? error : "Failed to upload video");
+  }
+};
+
 export const getProjectDataClient = async (
   idOrSlug: string
 ): Promise<FullProjectData | null> => {

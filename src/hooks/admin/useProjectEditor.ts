@@ -103,14 +103,12 @@ function projectReducer(
             ...s,
             media: (s.media || []).map((m, j) => {
               if (j !== action.mIndex) return m;
-              const isVideoType =
-                action.field === "url" &&
-                (m.type === "video" || m.type === "youtube");
+              const isYoutubeUrl =
+                action.field === "url" && m.type === "youtube";
               return {
                 ...m,
-                [action.field]: isVideoType
-                  ? extractYouTubeId(action.value)
-                  : action.value,
+                [action.field]:
+                  isYoutubeUrl ? extractYouTubeId(action.value) : action.value,
               };
             }),
           };
@@ -232,6 +230,23 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     [draftData.id, updateMedia]
   );
 
+  const handleSectionVideoUpload = useCallback(
+    async (sIndex: number, mIndex: number, file: File) => {
+      if (!draftData.id) return;
+      setIsUploading(true);
+      try {
+        const { uploadVideoToStorage } = await import(
+          "@/services/client/project-service"
+        );
+        const result = await uploadVideoToStorage(draftData.id, file);
+        if (result.success) updateMedia(sIndex, mIndex, "url", result.data);
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [draftData.id, updateMedia]
+  );
+
   const save = useCallback(
     async (
       mode: "draft" | "publish",
@@ -292,6 +307,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     addMedia,
     removeMedia,
     handleSectionImageUpload,
+    handleSectionVideoUpload,
     save,
   };
 };

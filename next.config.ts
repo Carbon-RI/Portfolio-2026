@@ -55,6 +55,7 @@ const nextConfig: NextConfig = {
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://firebasestorage.googleapis.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com",
+      "media-src 'self' https://firebasestorage.googleapis.com https://*.googleapis.com",
       "font-src 'self' data:",
       "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseauth.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com",
       "frame-src 'self' https://www.youtube.com https://youtube.com https://*.firebaseapp.com https://*.firebaseauth.com https://accounts.google.com",

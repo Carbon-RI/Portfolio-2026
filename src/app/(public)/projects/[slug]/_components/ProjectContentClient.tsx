@@ -136,6 +136,7 @@ export const ProjectContentClient = ({
     addMedia,
     removeMedia,
     handleSectionImageUpload,
+    handleSectionVideoUpload,
     save,
   } = useProjectEditor(project);
 
@@ -269,6 +270,7 @@ export const ProjectContentClient = ({
             addMedia={addMedia}
             removeMedia={removeMedia}
             handleSectionImageUpload={handleSectionImageUpload}
+            handleSectionVideoUpload={handleSectionVideoUpload}
           />
         </div>
       ) : (

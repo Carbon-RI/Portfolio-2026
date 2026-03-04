@@ -42,13 +42,23 @@ export const ImageSlider = ({
   }
 
   const currentItem = validMedia[currentIndex] || validMedia[0];
-  const isVideo =
-    currentItem.type === "video" || currentItem.type === "youtube";
+  const isYouTube = currentItem.type === "youtube";
+  const isMp4Video = currentItem.type === "video";
 
   return (
     <div className="relative w-full h-full group bg-base-bg overflow-hidden border border-base-border">
       <div className="relative w-full h-full flex items-center justify-center">
-        {isVideo ? (
+        {isMp4Video ? (
+          <div className="w-full aspect-video bg-black">
+            <video
+              key={currentItem.url}
+              src={currentItem.url}
+              controls
+              className="w-full h-full object-contain"
+              playsInline
+            />
+          </div>
+        ) : isYouTube ? (
           <div className="w-full aspect-video bg-black">
             <iframe
               key={currentItem.url}

@@ -32,7 +32,7 @@ export const mapToFullData = (
   id: string,
   data: Record<string, unknown>
 ): FullProjectData => {
-  const showDetailValue = (data.showDetail as boolean) ?? false;
+  const showDetailValue = (data.showDetail as boolean) ?? true;
   const ensureCategoryArray = (cat: unknown): string[] => {
     if (Array.isArray(cat)) return cat.map(String);
     if (typeof cat === "string" && cat.length > 0) return [cat];
