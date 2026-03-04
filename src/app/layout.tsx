@@ -11,6 +11,7 @@ const oswald = Oswald({
   display: "swap",
   preload: true,
   fallback: ["sans-serif"],
+  adjustFontFallback: true,
 });
 
 const jakarta = Plus_Jakarta_Sans({
@@ -20,6 +21,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
   preload: true,
   fallback: ["system-ui", "sans-serif"],
+  adjustFontFallback: true,
 });
 
 const jetbrains = JetBrains_Mono({
@@ -29,6 +31,7 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
   preload: true,
   fallback: ["monospace"],
+  adjustFontFallback: true,
 });
 
 export const viewport: Viewport = {
@@ -72,12 +75,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const firebaseAuthDomain =
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ??
+    "my-portfolio-de333.firebaseapp.com";
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
       className={`${oswald.variable} ${jakarta.variable} ${jetbrains.variable}`}
     >
+      <head>
+        <link rel="preconnect" href={`https://${firebaseAuthDomain}`} />
+        <link rel="preconnect" href="https://apis.google.com" crossOrigin="" />
+      </head>
       <body className="font-body bg-base-bg antialiased">
         {children}
         <Toaster position="top-right" richColors closeButton />

@@ -125,7 +125,7 @@ export type { TechIconKey };
 export const getProjectStatus = (project: {
   is_deleted: boolean;
   published: boolean;
-  draft?: any;
+  draft?: unknown;
 }): ProjectStatus => {
   if (project.is_deleted) return "Deleted";
   if (project.published) return project.draft ? "DraftModified" : "Published";

@@ -27,7 +27,7 @@ export function EditableText<K extends string>({
 }: EditableBaseProps<K> & {
   as?: ElementType;
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }) {
   const [currentValue, setCurrentValue] = useState(initialValue);
   const [isEditing, setIsEditing] = useState(false);

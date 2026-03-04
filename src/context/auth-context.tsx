@@ -48,8 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let isMounted = true;
-    let loadCleanup: (() => void) | undefined;
-
     const initAuth = async () => {
       try {
         const [{ getFirebaseAuth }, { onAuthStateChanged }] = await Promise.all([
@@ -77,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    loadCleanup = deferAfterLCP(initAuth);
+    const loadCleanup = deferAfterLCP(initAuth);
 
     return () => {
       isMounted = false;

@@ -81,7 +81,8 @@ export const mergeProjectAndDraft = (
   project: FullProjectData
 ): FullProjectData => {
   if (!project.draft) {
-    const { draft: _, ...rest } = project;
+    const { draft, ...rest } = project;
+    void draft;
     return rest as FullProjectData;
   }
   const { draft, ...base } = project;

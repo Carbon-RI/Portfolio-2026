@@ -15,7 +15,7 @@ import { extractYouTubeId } from "@/services/utils/project-formatter";
 
 // --- Types for Reducer ---
 type ProjectAction =
-  | { type: "SET_FIELD"; field: keyof FullProjectData; value: any }
+  | { type: "SET_FIELD"; field: keyof FullProjectData; value: unknown }
   | { type: "TOGGLE_TECH"; techKey: TechIconKey }
   | { type: "ADD_SECTION" }
   | { type: "REMOVE_SECTION"; sIndex: number }
@@ -23,7 +23,7 @@ type ProjectAction =
       type: "UPDATE_SECTION_FIELD";
       sIndex: number;
       field: keyof ProjectSection;
-      value: any;
+      value: unknown;
     }
   | { type: "ADD_MEDIA"; sIndex: number }
   | { type: "REMOVE_MEDIA"; sIndex: number; mIndex: number }
@@ -152,7 +152,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
   );
 
   const handleFieldChange = useCallback(
-    (field: keyof FullProjectData, value: any) =>
+    (field: keyof FullProjectData, value: unknown) =>
       dispatch({ type: "SET_FIELD", field, value }),
     []
   );
@@ -166,7 +166,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
     []
   );
   const updateSectionField = useCallback(
-    (sIndex: number, field: keyof ProjectSection, value: any) =>
+    (sIndex: number, field: keyof ProjectSection, value: unknown) =>
       dispatch({ type: "UPDATE_SECTION_FIELD", sIndex, field, value }),
     []
   );
@@ -206,7 +206,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
         } else {
           setPreviewUrl(initialProject.imageSrc);
         }
-      } catch (error) {
+      } catch {
         setPreviewUrl(initialProject.imageSrc);
       } finally {
         setIsUploading(false);
@@ -263,8 +263,8 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
         );
         const result =
           mode === "draft"
-            ? await saveProjectDraft(id, contentFields as any)
-            : await publishProject(id, contentFields as any);
+            ? await saveProjectDraft(id, contentFields as Partial<FullProjectData>)
+            : await publishProject(id, contentFields as Partial<FullProjectData>);
 
         if (result.success && onSuccess) onSuccess(slug);
         return result.success

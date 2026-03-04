@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { getPublishedProjects } from "@/services/server/project-service";
 import { getProfileSettings } from "@/services/server/profile-service";
 import { defaultSettings } from "@/types/index";
@@ -6,7 +7,9 @@ import { SplitLayoutServer } from "@/components/layout/SplitLayoutServer";
 import { HeroSection } from "./_components/HeroSection";
 import { HeroVisibilityController } from "./_components/HeroVisibilityController";
 import { HomeLeftPanelWithObserver } from "./_components/HomeLeftPanelWithObserver";
-import { HomeRightContent } from "./_components/HomeRightContent";
+import { HomeRightPanel } from "./_components/HomeRightPanel";
+
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await getProfileSettings();
@@ -46,10 +49,18 @@ export default async function Home() {
               welcomeMessageText={profileSettings.welcomeMessageText ?? ""}
             />
           </HeroVisibilityController>
-          <HomeRightContent
-            profileSettings={profileSettings}
-            projects={projects}
-          />
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex items-center justify-center min-h-[200px]">
+                <div className="h-8 w-32 animate-pulse bg-layer-faint rounded" />
+              </div>
+            }
+          >
+            <HomeRightPanel
+              profileSettings={profileSettings}
+              projects={projects}
+            />
+          </Suspense>
         </>
       }
     />

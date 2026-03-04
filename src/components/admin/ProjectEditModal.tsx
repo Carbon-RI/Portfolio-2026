@@ -38,7 +38,7 @@ export const ProjectEditModal = ({
   const [showSavedText, setShowSavedText] = useState(false);
 
   useEffect(() => {
-    setHasSavedDuringSession(false);
+    queueMicrotask(() => setHasSavedDuringSession(false));
   }, [initialProject.id]);
 
   const baseData = useMemo(() => {

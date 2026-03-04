@@ -13,15 +13,15 @@ import {
 } from "@/types/index";
 import { mapToFullData } from "@/services/utils/project-converter";
 import { cleanFields } from "@/services/utils/object-utils";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { FB_COLLECTIONS } from "@/lib/constants";
 import { projectSchema } from "@/lib/validation/schemas";
 
 type ProjectSaveData = Partial<Omit<FullProjectData, "draft">>;
 
-// --- Helper ---
 function refreshProjectCache(slug?: string) {
   revalidatePath("/");
+  revalidateTag("published-projects", "max");
   if (slug) revalidatePath(`/projects/${slug}`);
 }
 
@@ -58,9 +58,9 @@ export const getProjectData = async (
   }
 };
 
-export const getPublishedProjects = async (): Promise<
+async function fetchPublishedProjects(): Promise<
   Result<FullProjectData[]>
-> => {
+> {
   try {
     const snap = await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
@@ -75,7 +75,13 @@ export const getPublishedProjects = async (): Promise<
         : new Error("Failed to fetch published projects")
     );
   }
-};
+}
+
+export const getPublishedProjects = unstable_cache(
+  fetchPublishedProjects,
+  ["published-projects"],
+  { revalidate: 60, tags: ["published-projects"] }
+);
 
 export const getAllProjects = async (): Promise<Result<FullProjectData[]>> => {
   try {
@@ -104,7 +110,9 @@ export async function saveProjectDraft(
         validated.error.issues[0]?.message ?? "Invalid draft data"
       );
 
-    const { draft: _, slug, title, published, showDetail, ...draftOnlyFields } = fields;
+    const { draft, slug, title, published, showDetail, ...draftOnlyFields } =
+      fields;
+    void draft;
 
     await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
@@ -139,7 +147,8 @@ export async function publishProject(
     if (!validated.success)
       return failure(validated.error.issues[0]?.message ?? "Invalid data");
 
-    const { draft: _, ...rootFields } = fields;
+    const { draft, ...rootFields } = fields;
+    void draft;
     if (!rootFields.slug) return failure("Slug is required for publishing.");
 
     await getAdminDb()
@@ -200,6 +209,7 @@ export async function hardDeleteProject(
       .doc(projectId)
       .delete();
     revalidatePath("/");
+    revalidateTag("published-projects", "max");
     return success(undefined);
   } catch (error) {
     return failure(

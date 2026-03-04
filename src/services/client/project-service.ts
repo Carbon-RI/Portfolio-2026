@@ -1,5 +1,4 @@
 import {
-  getDb,
   getFirebaseStorage,
   getFirebaseApp,
 } from "@/lib/firebase/client";

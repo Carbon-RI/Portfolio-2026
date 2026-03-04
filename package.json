@@ -43,7 +43,7 @@
     "typescript": "^5.9.3"
   },
   "browserslist": [
-    "last 5 years",
+    "last 2 years",
     "not dead",
     "> 0.2%"
   ],
