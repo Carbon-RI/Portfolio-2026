@@ -6,8 +6,7 @@ import { HomeLeftPanel } from "./HomeLeftPanel";
 import { SECTIONS, SectionId } from "@/types/index";
 import { ProfileSettings } from "@/types/index";
 import { MAIN_SCROLL_ID } from "@/components/layout/SplitLayoutServer";
-
-const ROOT_MARGIN_HOME_SECTION_ACTIVE = "-40% 0px -40% 0px";
+import { SCROLL_CONFIG } from "@/types";
 
 interface HomeLeftPanelWithObserverProps {
   profileSettings: ProfileSettings;
@@ -23,44 +22,36 @@ export function HomeLeftPanelWithObserver({
     const scrollEl = document.getElementById(MAIN_SCROLL_ID);
     if (!scrollEl) return;
 
-    const observedIds = new Set<string>();
+    const handleScroll = () => {
+      const scrollPosition =
+        scrollEl.scrollTop + SCROLL_CONFIG.SECTION_ACTIVE_OFFSET_PX;
+      const containerTop = scrollEl.getBoundingClientRect().top;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const intersecting = entries.filter((e) => e.isIntersecting);
-        if (intersecting.length === 0) return;
-        const best = intersecting.reduce((a, b) =>
-          (a.intersectionRatio ?? 0) >= (b.intersectionRatio ?? 0) ? a : b
-        );
-        setActiveSection(best.target.id as SectionId);
-      },
-      {
-        root: scrollEl,
-        rootMargin: ROOT_MARGIN_HOME_SECTION_ACTIVE,
-        threshold: 0,
-      }
-    );
-
-    const observeSections = () => {
-      const sections = scrollEl.querySelectorAll("section[id]");
-      sections.forEach((section) => {
-        if (
-          SECTIONS.includes(section.id as SectionId) &&
-          !observedIds.has(section.id)
-        ) {
-          observedIds.add(section.id);
-          observer.observe(section);
+      for (const id of SECTIONS) {
+        const el = document.getElementById(id);
+        if (el) {
+          const elTop =
+            el.getBoundingClientRect().top - containerTop + scrollEl.scrollTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= elTop && scrollPosition < elTop + height) {
+            setActiveSection(id);
+            return;
+          }
         }
-      });
+      }
     };
 
-    observeSections();
+    handleScroll();
 
-    const mutationObserver = new MutationObserver(observeSections);
+    const mutationObserver = new MutationObserver(() => {
+      handleScroll();
+    });
     mutationObserver.observe(scrollEl, { childList: true, subtree: true });
 
+    scrollEl.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => {
-      observer.disconnect();
+      scrollEl.removeEventListener("scroll", handleScroll);
       mutationObserver.disconnect();
     };
   }, []);

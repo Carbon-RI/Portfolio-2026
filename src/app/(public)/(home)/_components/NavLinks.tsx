@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { MAIN_SCROLL_ID } from "@/components/layout/SplitLayoutServer";
 
 const navItems = [
   { id: "welcome", label: "Home" },
@@ -11,7 +12,17 @@ const navItems = [
 export function NavLinks({ activeSectionId }: { activeSectionId: string }) {
   const handleNavClick = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById(id);
+    const scrollEl = document.getElementById(MAIN_SCROLL_ID);
+    if (element && scrollEl) {
+      const elementTop = element.getBoundingClientRect().top;
+      const containerTop = scrollEl.getBoundingClientRect().top;
+      const scrollOffset =
+        scrollEl.scrollTop + elementTop - containerTop;
+      scrollEl.scrollTo({ top: scrollOffset, behavior: "smooth" });
+    } else if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
