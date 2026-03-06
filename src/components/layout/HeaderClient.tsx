@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { LG_QUERY, SCROLL_CONFIG, type SectionId } from "@/types";
 
@@ -11,10 +10,9 @@ interface HeaderClientProps {
 }
 
 export function HeaderClient({ sections }: HeaderClientProps) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, refreshSession } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState<SectionId>("welcome");
-  const router = useRouter();
 
   const headerHeightRef = useRef<number>(56);
   const matchMediaRef = useRef<MediaQueryList | null>(null);
@@ -92,7 +90,7 @@ export function HeaderClient({ sections }: HeaderClientProps) {
     try {
       const { logout } = await import("@/services/client/auth-service");
       await logout();
-      router.refresh();
+      await refreshSession();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {

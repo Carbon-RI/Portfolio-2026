@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
         : false,
   },
   async headers() {
-    const cspHeader = [
+    const cspParts = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com",
       "style-src 'self' 'unsafe-inline'",
@@ -59,8 +59,12 @@ const nextConfig: NextConfig = {
       "font-src 'self' data:",
       "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseauth.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com",
       "frame-src 'self' https://www.youtube.com https://youtube.com https://*.firebaseapp.com https://*.firebaseauth.com https://accounts.google.com",
-      "upgrade-insecure-requests",
-    ].join("; ");
+    ];
+    // Skip upgrade-insecure-requests in dev: localhost uses HTTP, causing ERR_SSL_PROTOCOL_ERROR
+    if (process.env.NODE_ENV === "production") {
+      cspParts.push("upgrade-insecure-requests");
+    }
+    const cspHeader = cspParts.join("; ");
 
     return [
       {

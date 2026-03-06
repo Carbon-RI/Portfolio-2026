@@ -1,4 +1,3 @@
-import { getFirebaseAuth } from "@/lib/firebase/client";
 import type { User } from "firebase/auth";
 import { Result, success, failure } from "@/types";
 
@@ -26,7 +25,10 @@ export const loginWithEmail = async (
   password: string
 ): Promise<Result<void>> => {
   try {
-    const { signInWithEmailAndPassword } = await import("firebase/auth");
+    const [{ signInWithEmailAndPassword }, { getFirebaseAuth }] = await Promise.all([
+      import("firebase/auth"),
+      import("@/lib/firebase/client").then((m) => ({ getFirebaseAuth: m.getFirebaseAuth })),
+    ]);
     const auth = getFirebaseAuth();
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -41,9 +43,13 @@ export const loginWithEmail = async (
 
 export const loginWithGoogle = async (): Promise<Result<void>> => {
   try {
-    const { GoogleAuthProvider, signInWithPopup } = await import(
-      "firebase/auth"
-    );
+    const [
+      { GoogleAuthProvider, signInWithPopup },
+      { getFirebaseAuth },
+    ] = await Promise.all([
+      import("firebase/auth"),
+      import("@/lib/firebase/client").then((m) => ({ getFirebaseAuth: m.getFirebaseAuth })),
+    ]);
     const auth = getFirebaseAuth();
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
@@ -57,14 +63,13 @@ export const loginWithGoogle = async (): Promise<Result<void>> => {
   }
 };
 
+/**
+ * Session-only logout. Clears the server session cookie via API.
+ * Does not load Firebase Auth, avoiding apis.google.com on main pages.
+ */
 export const logout = async (): Promise<void> => {
   try {
-    const { signOut } = await import("firebase/auth");
-    const auth = getFirebaseAuth();
-    await Promise.all([
-      signOut(auth),
-      fetch("/api/auth/logout", { method: "POST" }),
-    ]);
+    await fetch("/api/auth/logout", { method: "POST" });
   } catch (error) {
     console.error("Logout error:", error);
   }
