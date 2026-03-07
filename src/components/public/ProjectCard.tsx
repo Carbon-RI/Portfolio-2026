@@ -103,7 +103,7 @@ export const ProjectCard = ({
       {statusBadge}
 
       <div className="flex flex-col w-full shrink-0 header-border overflow-hidden bg-base-surface/20 [@media(max-height:500px)]:w-[42%] [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r border-base-border">
-        <div className="aspect-video lg:aspect-auto lg:h-[var(--project-card-image-height)] w-full relative overflow-hidden shrink-0 header-border">
+        <div className="aspect-video lg:aspect-auto lg:h-(--project-card-image-height) w-full relative overflow-hidden shrink-0 header-border">
           {isValidImageSrc ? (
             <Image
               src={imageSrc as string}
@@ -122,35 +122,33 @@ export const ProjectCard = ({
           )}
         </div>
 
-        <div className="p-4 lg:p-6 flex flex-col justify-start lg:flex-initial shrink-0 min-h-[4.5rem]">
-          <div className="flex items-center gap-x-2 mb-2 min-h-[1.5rem]">
+        <div className="p-4 lg:p-6 flex flex-col justify-start lg:flex-initial shrink-0 min-h-18">
+          <div className="flex items-center gap-x-2 mb-2 min-h-6">
             <span className="shrink-0 text-meta font-mono text-content-primary bg-base-surface px-1.5 py-0.5 uppercase tracking-nav border border-base-border">
               {industry || "\u00A0"}
             </span>
             <div className="flex gap-x-1.5 overflow-hidden text-meta font-mono text-layer-medium uppercase tracking-nav min-w-0">
               {categoriesList.length > 0 ? (
-                categoriesList.map((cat) => (
-                  <span key={cat}>/ {cat}</span>
-                ))
+                categoriesList.map((cat) => <span key={cat}>/ {cat}</span>)
               ) : (
                 <span className="text-transparent">/</span>
               )}
             </div>
           </div>
-          <h3 className="text-lg lg:text-xl leading-tight font-heading font-bold text-content-primary uppercase tracking-heading line-clamp-2 min-h-[2.5rem]">
+          <h3 className="text-lg lg:text-xl leading-tight font-heading font-bold text-content-primary uppercase tracking-heading line-clamp-2 min-h-10">
             {title || "\u00A0"}
           </h3>
         </div>
       </div>
 
       <div className="p-5 lg:p-6 flex flex-col flex-1 min-h-0 bg-base-bg overflow-hidden">
-        <div className="shrink-0 mb-[var(--project-card-gap,1.5rem)] min-h-[7.5rem]">
+        <div className="shrink-0 mb-(--project-card-gap,1.5rem) min-h-30">
           <p className="text-layer-medium text-sm lg:text-[15px] leading-relaxed font-light line-clamp-5 whitespace-pre-wrap">
             {summary || "\u00A0"}
           </p>
         </div>
 
-        <div className="mb-[var(--project-card-gap,1.5rem)] shrink-0 pt-[var(--project-card-gap,1.5rem)] footer-border min-h-[2.5rem]">
+        <div className="mb-(--project-card-gap,1.5rem) shrink-0 pt-(--project-card-gap,1.5rem) footer-border min-h-10">
           <div className="flex flex-wrap gap-2 lg:gap-3">
             {techStack.map((iconKey) => (
               <TechIconResolver
@@ -162,7 +160,7 @@ export const ProjectCard = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 footer-border mt-auto min-h-[2rem]">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 footer-border mt-auto min-h-8">
           {demoUrl && (
             <a
               href={demoUrl}

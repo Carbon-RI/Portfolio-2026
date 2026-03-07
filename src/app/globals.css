@@ -34,6 +34,12 @@
   /* Letter Spacing */
   --tracking-heading: 0.3em;
   --tracking-nav: 0.4em;
+
+  /* Z-Index (for modal overlay etc.) */
+  --z-index-modal: 50;
+
+  /* Container/Size (for max-w-100 truncation) */
+  --container-100: 25rem;
 }
 
 /* ==========================================================================

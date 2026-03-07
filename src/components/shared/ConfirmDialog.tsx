@@ -25,7 +25,7 @@ export const ConfirmDialog = ({
 
   return (
     <div
-      className="modal-overlay z-[200] backdrop-blur-md animate-in fade-in duration-fast"
+      className="modal-overlay z-200 backdrop-blur-md animate-in fade-in duration-fast"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"

@@ -37,21 +37,21 @@ export default async function Home() {
   return (
     <SplitLayoutServer
       hideLeftOnMobile={true}
-      left={
-        <HomeLeftPanelWithObserver profileSettings={profileSettings} />
-      }
+      left={<HomeLeftPanelWithObserver profileSettings={profileSettings} />}
       right={
         <>
           {/* Hero: Server-rendered, minimal Client wrapper only for admin hide */}
           <HeroVisibilityController>
             <HeroSection
-              welcomeMessageHeading={profileSettings.welcomeMessageHeading ?? ""}
+              welcomeMessageHeading={
+                profileSettings.welcomeMessageHeading ?? ""
+              }
               welcomeMessageText={profileSettings.welcomeMessageText ?? ""}
             />
           </HeroVisibilityController>
           <Suspense
             fallback={
-              <div className="w-full h-full flex items-center justify-center min-h-[200px]">
+              <div className="w-full h-full flex items-center justify-center min-h-50">
                 <div className="h-8 w-32 animate-pulse bg-layer-faint rounded" />
               </div>
             }

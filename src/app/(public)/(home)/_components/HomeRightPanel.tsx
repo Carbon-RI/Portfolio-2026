@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  Suspense,
-  lazy,
-} from "react";
+import React, { useCallback, useEffect, useState, Suspense, lazy } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
@@ -58,21 +52,23 @@ export function HomeRightPanel({
   const searchParams = useSearchParams();
 
   const [projects, setProjects] = useState<FullProjectData[]>(initialProjects);
-  const [profileSettings, setProfileSettings] =
-    useState<ProfileSettings>(initialProfileSettings);
+  const [profileSettings, setProfileSettings] = useState<ProfileSettings>(
+    initialProfileSettings
+  );
   const [loading, setLoading] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [adminDisplayProjects, setAdminDisplayProjects] = useState<
     FullProjectData[] | null
   >(null);
-  const [editingProject, setEditingProject] =
-    useState<FullProjectData | null>(() => {
+  const [editingProject, setEditingProject] = useState<FullProjectData | null>(
+    () => {
       if (!isAdmin) return null;
       const editSlug = searchParams.get("edit");
       if (!editSlug) return null;
       const found = initialProjects.find((p) => p.slug === editSlug);
       return found ?? null;
-    });
+    }
+  );
 
   const refetchProjects = useCallback(async (): Promise<FullProjectData[]> => {
     if (!isAdmin) return [];
@@ -110,9 +106,11 @@ export function HomeRightPanel({
 
   useEffect(() => {
     if (!isAdmin) return;
-    import("@/services/utils/project-converter").then(({ getAdminCardData }) => {
-      setAdminDisplayProjects(projects.map((p) => getAdminCardData(p, true)));
-    });
+    import("@/services/utils/project-converter").then(
+      ({ getAdminCardData }) => {
+        setAdminDisplayProjects(projects.map((p) => getAdminCardData(p, true)));
+      }
+    );
   }, [projects, isAdmin]);
 
   useEffect(() => {
@@ -175,9 +173,7 @@ export function HomeRightPanel({
     }
   }, [isAdmin, searchParams]);
 
-  const displayProjects = isAdmin
-    ? adminDisplayProjects ?? projects
-    : projects;
+  const displayProjects = isAdmin ? adminDisplayProjects ?? projects : projects;
 
   const handleSave = useCallback(
     async (field: keyof ProfileSettings, newValue: string) => {
@@ -204,7 +200,7 @@ export function HomeRightPanel({
   return (
     <Suspense
       fallback={
-        <div className="w-full h-full flex items-center justify-center min-h-[200px]">
+        <div className="w-full h-full flex items-center justify-center min-h-50">
           <div className="h-8 w-32 animate-pulse bg-layer-faint rounded" />
         </div>
       }
@@ -337,10 +333,7 @@ export function HomeRightPanel({
                   className="social-link p-2 text-layer-medium hover:text-content-primary transition-colors"
                   aria-label="Open contact form"
                 >
-                  <EmailIcon
-                    className="w-6 h-6 fill-current"
-                    title="Email"
-                  />
+                  <EmailIcon className="w-6 h-6 fill-current" title="Email" />
                 </button>
               </nav>
             </div>
