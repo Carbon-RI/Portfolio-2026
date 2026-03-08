@@ -59,7 +59,7 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
 
   return (
     <div
-      className="modal-overlay backdrop-blur-sm z-modal"
+      className="modal-overlay backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -92,7 +92,7 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
               onChange={handleChange}
               disabled={isFormDisabled}
               required
-              className="app-input-full"
+              className="app-input"
             />
           </div>
 
@@ -108,7 +108,7 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
               onChange={handleChange}
               disabled={isFormDisabled}
               required
-              className="app-input-full"
+              className="app-input"
             />
           </div>
 
@@ -124,7 +124,7 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
               onChange={handleChange}
               disabled={isFormDisabled}
               required
-              className="app-input-full resize-none"
+              className="app-input resize-none"
             />
           </div>
 

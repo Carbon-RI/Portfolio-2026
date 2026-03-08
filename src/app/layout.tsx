@@ -116,7 +116,7 @@ export default function RootLayout({
         <link rel="preconnect" href={`https://${firebaseAuthDomain}`} />
         <link rel="preconnect" href="https://apis.google.com" crossOrigin="" />
       </head>
-      <body className="font-body bg-base-bg antialiased">
+      <body>
         {children}
         <Toaster position="top-right" richColors closeButton />
       </body>

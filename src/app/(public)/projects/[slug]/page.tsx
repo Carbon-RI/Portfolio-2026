@@ -49,7 +49,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <ErrorBoundary
       fallback={
-        <div className="section-view bg-base-bg">
+        <div className="section-view">
           <p className="label-mono-small text-layer-medium mb-12">
             An error occurred while loading project details.
           </p>
@@ -60,7 +60,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       }
     >
       <Suspense
-        fallback={<div className="section-view bg-base-bg">Loading...</div>}
+        fallback={<div className="section-view">Loading...</div>}
       >
         <ProjectContentClient project={processedProject} isAdmin={isAdmin} />
       </Suspense>

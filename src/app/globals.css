@@ -27,16 +27,14 @@
   --font-mono: var(--font-jetbrains), monospace;
   --font-body: var(--font-jakarta), sans-serif;
 
-  /* Font Sizes (maps to text-tiny / text-xxs utility classes) */
-  --text-tiny: 10px;
-  --text-xxs: 11px;
+  /* Font Sizes (references :root, creates text-* utilities) */
+  --text-tiny: var(--text-xs);
+  --text-xxs: var(--text-sm);
+  --text-card-body: var(--text-md);
 
   /* Letter Spacing */
   --tracking-heading: 0.3em;
   --tracking-nav: 0.4em;
-
-  /* Z-Index (for modal overlay etc.) */
-  --z-index-modal: 50;
 
   /* Container/Size (for max-w-100 truncation) */
   --container-100: 25rem;
@@ -88,19 +86,18 @@
     /* Desktop cards use a fixed width for consistent layout */
     --card-width-lg: 500px;
     --card-width: var(--card-width-mobile);
-    --card-max-height-sm: 180px;
-    --card-max-height-lg: 220px;
 
     /* Project card vertical rhythm (used on desktop works section) */
     --project-card-image-height: 320px;
     --project-card-gap: 1.5rem;
 
     /* Typography */
+    --text-micro-size: 8px;
+    --text-meta-size: 9px;
     --text-xs: 10px;
     --text-sm: 11px;
     --text-base: 12px;
-    --text-meta-size: 9px;
-    --text-micro-size: 8px;
+    --text-md: 15px; /* card body, summary (between base and lg) */
 
     /* Borders & Transitions */
     --border-thin: 1px;
@@ -114,7 +111,6 @@
     /* Icon Sizes */
     --icon-xs: 1em;
     --icon-sm: 1.5rem;
-    --icon-md: 2.5rem;
   }
 
   @media (min-width: 768px) {
@@ -240,11 +236,6 @@
     @apply font-mono uppercase tracking-wider;
   }
 
-  .text-base-mono {
-    font-size: var(--text-base);
-    @apply font-mono uppercase tracking-nav;
-  }
-
   /* ---------- UI: Navigation ---------- */
   .nav-link {
     font-size: var(--text-base);
@@ -256,23 +247,9 @@
     @apply absolute -left-8 w-1 h-1 bg-content-primary rounded-full;
   }
 
-  .interactive-item {
-    @apply text-layer-medium hover:text-content-primary cursor-pointer;
-    transition: all var(--transition-normal);
-  }
-
   .tag-label {
     font-size: var(--text-base);
     @apply font-mono uppercase tracking-nav px-3 py-1.5 border border-base-border text-layer-high;
-  }
-
-  /* Prevents long descriptions from breaking card layout while retaining sufficient context. */
-  .dynamic-line-clamp {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-clamp: 10;
-    -webkit-line-clamp: 10;
   }
 
   /* ---------- UI: Forms ---------- */
@@ -287,11 +264,6 @@
   }
 
   .app-input {
-    @apply bg-base-bg border border-base-border p-4 text-content-primary text-sm focus:outline-none focus:border-content-primary;
-    transition: all var(--transition-normal);
-  }
-
-  .app-input-full {
     @apply w-full bg-base-bg border border-base-border p-4 text-content-primary text-sm focus:outline-none focus:border-content-primary;
     transition: all var(--transition-normal);
   }
@@ -372,11 +344,6 @@
   }
 
   /* ---------- UI: Alerts ---------- */
-  .alert-message {
-    font-size: var(--text-xs);
-    @apply p-4 bg-layer-faint border border-layer-muted uppercase tracking-nav;
-  }
-
   .alert-error {
     font-size: var(--text-xs);
     @apply p-4 bg-layer-faint border border-layer-muted uppercase tracking-nav text-accent-2;
@@ -398,20 +365,6 @@
     height: var(--icon-sm);
   }
 
-  .icon-md {
-    width: var(--icon-md);
-    height: var(--icon-md);
-  }
-
-  /* ---------- UI: Images ---------- */
-  .image-card-height {
-    max-height: var(--card-max-height-sm);
-  }
-  @media (min-width: 1024px) {
-    .image-card-height {
-      max-height: var(--card-max-height-lg);
-    }
-  }
 }
 
 /* ==========================================================================
@@ -438,10 +391,6 @@
 
   .min-h-section {
     min-height: var(--content-height-no-footer);
-  }
-
-  .max-h-90 {
-    max-height: var(--vh-90);
   }
 
   /* 9px: card meta / small labels */

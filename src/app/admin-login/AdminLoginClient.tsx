@@ -73,7 +73,7 @@ export const AdminLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="app-input-full"
+              className="app-input"
               placeholder="admin@example.com"
             />
           </div>
@@ -88,7 +88,7 @@ export const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="app-input-full"
+              className="app-input"
               placeholder="********"
             />
           </div>

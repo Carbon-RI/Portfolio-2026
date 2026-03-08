@@ -143,7 +143,7 @@ export const ProjectCard = ({
 
       <div className="p-5 lg:p-6 flex flex-col flex-1 min-h-0 bg-base-bg overflow-hidden">
         <div className="shrink-0 mb-(--project-card-gap,1.5rem) min-h-30">
-          <p className="text-layer-medium text-sm lg:text-[15px] leading-relaxed font-light line-clamp-5 whitespace-pre-wrap">
+          <p className="text-layer-medium text-sm lg:text-card-body leading-relaxed font-light line-clamp-5 whitespace-pre-wrap">
             {summary || "\u00A0"}
           </p>
         </div>

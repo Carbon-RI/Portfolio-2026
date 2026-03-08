@@ -92,7 +92,7 @@ export const BasicInfoEditor = ({
           type="text"
           value={draftData.title || ""}
           onChange={handleTitleChange}
-          className="app-input-full"
+          className="app-input"
           placeholder="Project Title"
         />
       </div>
@@ -112,7 +112,7 @@ export const BasicInfoEditor = ({
           type="text"
           value={draftData.slug || ""}
           onChange={handleManualSlugChange}
-          className="app-input-full bg-layer-faint font-mono text-sm border-dashed focus:border-solid"
+          className="app-input bg-layer-faint font-mono text-sm border-dashed focus:border-solid"
           placeholder="Enter slug or auto-generate..."
         />
       </div>
@@ -156,7 +156,7 @@ export const BasicInfoEditor = ({
             list="industry-list"
             value={draftData.industry || ""}
             onChange={(e) => handleFieldChange("industry", e.target.value)}
-            className="app-input-full"
+            className="app-input"
           />
           <datalist id="industry-list">
             {PROJECT_INDUSTRIES.map((v) => (
@@ -172,7 +172,7 @@ export const BasicInfoEditor = ({
           value={draftData.summary || ""}
           onChange={(e) => handleFieldChange("summary", e.target.value)}
           rows={3}
-          className="app-input-full resize-none"
+          className="app-input resize-none"
         />
       </div>
 
@@ -188,7 +188,7 @@ export const BasicInfoEditor = ({
               type="url"
               value={draftData.demoUrl || ""}
               onChange={(e) => handleFieldChange("demoUrl", e.target.value)}
-              className="app-input-full font-mono text-sm"
+              className="app-input font-mono text-sm"
               placeholder="https://..."
             />
           </div>
@@ -200,7 +200,7 @@ export const BasicInfoEditor = ({
               type="url"
               value={draftData.githubUrl || ""}
               onChange={(e) => handleFieldChange("githubUrl", e.target.value)}
-              className="app-input-full font-mono text-sm"
+              className="app-input font-mono text-sm"
               placeholder="https://github.com/..."
             />
           </div>
