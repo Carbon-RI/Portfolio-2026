@@ -141,14 +141,14 @@ export const ProjectCard = ({
         </div>
       </div>
 
-      <div className="p-4 lg:py-2 flex flex-col flex-1 min-h-0 bg-base-bg overflow-hidden">
+      <div className="p-4 lg:py-2 flex flex-col flex-1 bg-base-bg overflow-hidden">
         <div className="shrink-0 mb-(--project-card-gap,1.5rem)">
           <p className="text-start text-layer-medium text-sm lg:text-card-body leading-relaxed font-light line-clamp-3 [@media(min-height:600px)]:line-clamp-5 whitespace-pre-wrap">
             {summary || "\u00A0"}
           </p>
         </div>
 
-        <div className="mb-(--project-card-gap,1.5rem) shrink-0 pt-(--project-card-gap,1.5rem) footer-border min-h-10">
+        <div className="mb-(--project-card-gap,1.5rem) shrink-0 pt-(--project-card-gap,1.5rem) footer-border min-h-8 mt-auto">
           <div className="flex flex-wrap gap-2 lg:gap-3">
             {techStack.map((iconKey) => (
               <TechIconResolver
@@ -160,7 +160,7 @@ export const ProjectCard = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 footer-border mt-auto min-h-8">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 py-3 footer-border min-h-8">
           {demoUrl && (
             <a
               href={demoUrl}

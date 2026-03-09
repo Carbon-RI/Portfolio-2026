@@ -283,7 +283,7 @@ export function HomeRightPanel({
                     initialValue={profileSettings.aboutMeText}
                     onSave={handleSave}
                     isAdmin={isAdmin}
-                    className="text-content-secondary mb-8 md:mb-32 text-base md:text-lg font-light leading-relaxed profile-summary"
+                    className="text-content-secondary mb-8 md:mb-12 text-base md:text-lg font-light leading-relaxed profile-summary"
                   />
                 </Suspense>
               ) : (
