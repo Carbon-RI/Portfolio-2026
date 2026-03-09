@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { Button } from "@/components/shared/Button";
+import { Modal } from "@/components/shared/Modal";
 
 interface ContactModalProps {
   onClose: () => void;
@@ -58,16 +60,11 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
   const isFormDisabled = status === "loading" || status === "success";
 
   return (
-    <div
-      className="modal-overlay backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+    <Modal
+      onClose={onClose}
+      overlayClassName="backdrop-blur-sm"
+      panelClassName="max-w-xl p-8 md:p-12 shadow-2xl"
     >
-      <div
-        className="modal-content-md max-w-xl p-8 md:p-12 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
         <h3 className="text-xl mb-10 text-center">Contact</h3>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -128,24 +125,25 @@ export const ContactModal = ({ onClose }: ContactModalProps) => {
             />
           </div>
 
-          <button
+          <Button
+            variant="primary"
             type="submit"
             disabled={isFormDisabled}
-            className="w-full btn-primary"
+            className="w-full"
           >
             {status === "loading" ? "Sending..." : "Send Message"}
-          </button>
+          </Button>
         </form>
 
         {!isFormDisabled && (
-          <button
+          <Button
+            variant="ghost"
             onClick={onClose}
-            className="mt-6 w-full btn-base text-layer-medium hover:text-content-primary"
+            className="mt-6 w-full text-layer-medium hover:text-content-primary"
           >
             Close
-          </button>
+          </Button>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 };

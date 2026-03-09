@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { LG_QUERY, SCROLL_CONFIG, type SectionId } from "@/types";
+import { Button } from "@/components/shared/Button";
 
 interface HeaderClientProps {
   sections: readonly SectionId[];
@@ -130,13 +131,14 @@ export function HeaderClient({ sections }: HeaderClientProps) {
 
       <div className="flex-1 flex justify-end">
         {isAdmin ? (
-          <button
+          <Button
+            variant="secondary"
             onClick={handleLogout}
             disabled={loading}
-            className="btn-secondary h-8 px-4"
+            className="h-8 px-4"
           >
             {loading ? "..." : "Logout"}
-          </button>
+          </Button>
         ) : (
           <Link
             href="/admin-login"

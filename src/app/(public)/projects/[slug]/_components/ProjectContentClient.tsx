@@ -12,6 +12,7 @@ import {
 } from "@/types/index";
 import { useProjectEditor } from "@/hooks/admin/useProjectEditor";
 import { ProjectDetailEditor } from "@/components/admin/ProjectDetailEditor";
+import { Button } from "@/components/shared/Button";
 import { toast } from "sonner";
 
 interface ProjectContentClientProps {
@@ -223,27 +224,30 @@ export const ProjectContentClient = ({
           <div className="flex gap-2 items-center">
             {isEditMode ? (
               <>
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() => setIsEditMode(false)}
-                  className="btn-secondary tracking-tight"
+                  className="tracking-tight"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={handleSave}
                   disabled={isUploading}
-                  className="btn-base font-bold tracking-tight px-6 py-2 bg-content-primary text-base-bg hover:bg-content-secondary disabled:opacity-50"
+                  className="font-bold tracking-tight px-6 py-2 bg-content-primary text-base-bg hover:bg-content-secondary disabled:opacity-50"
                 >
                   Save
-                </button>
+                </Button>
               </>
             ) : (
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setIsEditMode(true)}
-                className="btn-outline text-accent-1"
+                className="text-accent-1"
               >
                 Edit Content
-              </button>
+              </Button>
             )}
           </div>
         )}

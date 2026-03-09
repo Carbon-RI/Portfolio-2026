@@ -11,6 +11,7 @@ import {
   EmailIcon,
 } from "@/components/shared/SocialIcons";
 import type { EditableText as EditableTextType } from "@/components/admin/EditableText";
+import { SectionView } from "@/components/layout/SectionView";
 import { toast } from "sonner";
 
 const EditableText = lazy(() =>
@@ -212,10 +213,10 @@ export function HomeRightPanel({
       >
         <div className="flex flex-col h-full">
           {isAdmin && (
-            <section
+            <SectionView
               id="welcome"
               aria-label="Welcome Section"
-              className="section-view-no-py flex items-center shrink-0 min-h-section lg:min-h-0 lg:h-full scroll-mt-(--header-height) lg:scroll-mt-0"
+              className="shrink-0 min-h-section lg:min-h-0 lg:h-full"
               style={
                 {
                   contentVisibility: "visible",
@@ -247,13 +248,13 @@ export function HomeRightPanel({
                   />
                 </Suspense>
               </div>
-            </section>
+            </SectionView>
           )}
 
-          <section
+          <SectionView
             id="profile"
             aria-label="About Me Section"
-            className="section-view-no-py flex items-center shrink-0 min-h-section lg:min-h-0 lg:h-full footer-border scroll-mt-(--header-height) lg:scroll-mt-0"
+            className="shrink-0 min-h-section lg:min-h-0 lg:h-full footer-border"
             style={
               {
                 contentVisibility: "auto",
@@ -337,12 +338,12 @@ export function HomeRightPanel({
                 </button>
               </nav>
             </div>
-          </section>
+          </SectionView>
 
-          <section
+          <SectionView
             id="works"
             aria-label="Projects and Works"
-            className="section-view-no-py footer-border overflow-hidden flex items-center shrink-0 min-h-(--content-height) lg:h-full lg:max-h-(--vh-85) scroll-mt-(--header-height) lg:scroll-mt-0"
+            className="footer-border overflow-hidden shrink-0 min-h-(--content-height) lg:h-full lg:max-h-(--vh-85)"
             style={
               {
                 contentVisibility: "auto",
@@ -368,7 +369,7 @@ export function HomeRightPanel({
                 />
               </div>
             </div>
-          </section>
+          </SectionView>
 
           {isEmailModalOpen && (
             <Suspense

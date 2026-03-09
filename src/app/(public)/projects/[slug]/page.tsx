@@ -4,6 +4,7 @@ import { mergeProjectAndDraft } from "@/services/utils/project-converter";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { buttonClass } from "@/components/shared/Button";
 import ProjectContentClient from "./_components/ProjectContentClient";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { Suspense } from "react";
@@ -49,18 +50,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <ErrorBoundary
       fallback={
-        <div className="section-view">
+        <div className="flex flex-col justify-center items-center px-4 py-20 lg:py-24 text-center bg-base-bg transition-all duration-fast scroll-mt-(--header-height) lg:min-h-(--content-height-no-footer)">
           <p className="label-mono-small text-layer-medium mb-12">
             An error occurred while loading project details.
           </p>
-          <Link href="/" className="btn-primary">
+          <Link href="/" className={buttonClass("primary")}>
             &larr; Return to Portfolio
           </Link>
         </div>
       }
     >
       <Suspense
-        fallback={<div className="section-view">Loading...</div>}
+        fallback={<div className="flex flex-col justify-center items-center px-4 py-20 lg:py-24 text-center bg-base-bg transition-all duration-fast scroll-mt-(--header-height) lg:min-h-(--content-height-no-footer)">Loading...</div>}
       >
         <ProjectContentClient project={processedProject} isAdmin={isAdmin} />
       </Suspense>

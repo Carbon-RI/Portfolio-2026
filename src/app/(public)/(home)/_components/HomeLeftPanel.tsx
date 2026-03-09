@@ -20,7 +20,7 @@ export const HomeLeftPanel = ({
   activeSectionId,
 }: HomeLeftPanelProps) => {
   return (
-    <aside className="side-panel-left">
+    <aside className="w-full flex flex-col items-center bg-base-bg p-8 border-b border-base-border lg:fixed lg:w-1/2 lg:h-svh lg:justify-center lg:p-12 lg:border-r lg:border-b-0">
       <div className="flex flex-col gap-4 items-center group">
         {isAdmin ? (
           <Suspense

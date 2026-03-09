@@ -12,6 +12,8 @@ import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useProjectEditor } from "@/hooks/admin/useProjectEditor";
 import { BasicInfoEditor } from "@/components/admin/BasicInfoEditor";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { Button } from "@/components/shared/Button";
+import { Modal } from "@/components/shared/Modal";
 
 interface ProjectEditModalProps {
   initialProject: FullProjectData;
@@ -133,15 +135,12 @@ export const ProjectEditModal = ({
 
   return (
     <>
-      <div
-        className="modal-overlay z-100 animate-in fade-in duration-normal"
-        onClick={handleClose}
+      <Modal
+        onClose={handleClose}
+        overlayClassName="z-100 animate-in fade-in duration-normal"
+        panelClassName="text-content-primary max-h-[90dvh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-normal"
       >
-        <div
-          className="modal-content-md text-content-primary max-h-[90dvh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-normal"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <header className="modal-header border-b border-base-border/50">
+          <header className="p-6 flex justify-between items-center bg-base-surface sticky top-0 z-20 border-b border-base-border/50">
             <div className="flex flex-col">
               <h2 className="text-sm-mono text-layer-medium truncate max-w-100">
                 {!initialProject.slug && !initialProject.published
@@ -199,7 +198,7 @@ export const ProjectEditModal = ({
             </ErrorBoundary>
           </main>
 
-          <footer className="modal-footer border-t border-base-border bg-layer-faint/30">
+          <footer className="p-6 flex justify-end gap-4 border-t border-base-border bg-layer-faint/30">
             <button
               onClick={() => setConfirmState({ isOpen: true, mode: "delete" })}
               className="text-xs-mono text-accent-2 px-4 py-2 hover:bg-accent-2/5 transition-all disabled:opacity-30"
@@ -217,18 +216,20 @@ export const ProjectEditModal = ({
               >
                 {hasSavedDuringSession ? "Close" : "Cancel"}
               </button>
-              <button
+              <Button
+                variant="outline"
                 onClick={() => executeAction("draft")}
-                className="btn-outline text-xs-mono text-accent-1 px-4 py-2"
+                className="text-accent-1 px-4 py-2"
                 disabled={isUploading || !isDirty || !isSlugValid}
               >
                 Save Draft
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() =>
                   setConfirmState({ isOpen: true, mode: "publish" })
                 }
-                className="btn-base font-bold bg-content-primary text-base-bg px-8 py-2.5 text-xs-mono disabled:opacity-30"
+                className="font-bold bg-content-primary text-base-bg px-8 py-2.5 disabled:opacity-30"
                 disabled={
                   isUploading ||
                   !isSlugValid ||
@@ -236,11 +237,10 @@ export const ProjectEditModal = ({
                 }
               >
                 Publish Now
-              </button>
+              </Button>
             </div>
           </footer>
-        </div>
-      </div>
+      </Modal>
 
       <ConfirmDialog
         isOpen={confirmState.isOpen}
