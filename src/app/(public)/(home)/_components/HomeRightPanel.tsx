@@ -254,7 +254,7 @@ export function HomeRightPanel({
           <SectionView
             id="profile"
             aria-label="About Me Section"
-            className="shrink-0 min-h-section lg:min-h-section-desktop lg:h-full footer-border"
+            className="overflow-hidden shrink-0 min-h-section lg:min-h-section-desktop lg:h-full lg:max-h-(--vh-85) footer-border"
             style={
               {
                 contentVisibility: "auto",
@@ -262,7 +262,7 @@ export function HomeRightPanel({
               } as React.CSSProperties
             }
           >
-            <div className="max-w-2xl mx-auto px-4 lg:px-6 w-full py-8 lg:py-12">
+            <div className="max-w-2xl mx-auto px-4 lg:px-6 w-full py-4 lg:py-6">
               {isAdmin ? (
                 <Suspense
                   fallback={
@@ -275,7 +275,7 @@ export function HomeRightPanel({
                     initialValue={profileSettings.aboutMeHeading}
                     onSave={handleSave}
                     isAdmin={isAdmin}
-                    className="text-3xl md:text-4xl lg:text-5xl mb-6 md:mb-10 text-content-primary"
+                    className="text-3xl md:text-4xl lg:text-5xl mb-6 text-content-primary"
                   />
                   <EditableText
                     as="p"
@@ -283,15 +283,15 @@ export function HomeRightPanel({
                     initialValue={profileSettings.aboutMeText}
                     onSave={handleSave}
                     isAdmin={isAdmin}
-                    className="text-content-secondary mb-8 md:mb-12 text-base md:text-lg font-light leading-relaxed"
+                    className="text-content-secondary mb-8 md:mb-12 text-base md:text-lg font-light leading-relaxed profile-summary"
                   />
                 </Suspense>
               ) : (
                 <>
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl mb-6 md:mb-10 text-content-primary">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl mb-6 text-content-primary">
                     {profileSettings.aboutMeHeading}
                   </h2>
-                  <p className="text-content-secondary mb-8 md:mb-12 text-base md:text-lg font-light leading-relaxed">
+                  <p className="text-content-secondary mb-8 text-base md:text-lg font-light leading-relaxed">
                     {profileSettings.aboutMeText}
                   </p>
                 </>
