@@ -17,7 +17,7 @@ export function HeroSection({
     <SectionView
       id="welcome"
       aria-label="Welcome Section"
-      className="shrink-0 min-h-section lg:min-h-0 lg:h-full"
+      className="shrink-0 min-h-section lg:min-h-section-desktop lg:h-full"
       style={
         {
           contentVisibility: "visible",

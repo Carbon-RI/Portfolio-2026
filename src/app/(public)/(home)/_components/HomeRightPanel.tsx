@@ -216,7 +216,7 @@ export function HomeRightPanel({
             <SectionView
               id="welcome"
               aria-label="Welcome Section"
-              className="shrink-0 min-h-section lg:min-h-0 lg:h-full"
+              className="shrink-0 min-h-section lg:min-h-section-desktop lg:h-full"
               style={
                 {
                   contentVisibility: "visible",
@@ -254,7 +254,7 @@ export function HomeRightPanel({
           <SectionView
             id="profile"
             aria-label="About Me Section"
-            className="shrink-0 min-h-section lg:min-h-0 lg:h-full footer-border"
+            className="shrink-0 min-h-section lg:min-h-section-desktop lg:h-full footer-border"
             style={
               {
                 contentVisibility: "auto",

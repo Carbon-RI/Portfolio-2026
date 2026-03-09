@@ -38,6 +38,10 @@
 
   /* Container/Size (for max-w-100 truncation) */
   --container-100: 25rem;
+
+  /* Section heights (for min-h-section utility) */
+  --min-height-section: var(--content-height-no-footer);
+  --min-height-section-desktop: var(--content-height);
 }
 
 /* ==========================================================================
@@ -271,7 +275,6 @@
     width: var(--icon-sm);
     height: var(--icon-sm);
   }
-
 }
 
 /* ==========================================================================
@@ -294,10 +297,6 @@
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-  }
-
-  .min-h-section {
-    min-height: var(--content-height-no-footer);
   }
 
   /* 9px: card meta / small labels */

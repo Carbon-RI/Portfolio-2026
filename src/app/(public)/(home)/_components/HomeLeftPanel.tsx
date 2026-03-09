@@ -20,7 +20,7 @@ export const HomeLeftPanel = ({
   activeSectionId,
 }: HomeLeftPanelProps) => {
   return (
-    <aside className="w-full flex flex-col items-center bg-base-bg p-8 border-b border-base-border lg:fixed lg:w-1/2 lg:h-svh lg:justify-center lg:p-12 lg:border-r lg:border-b-0">
+    <aside className="fixed w-1/2 h-(--content-height) flex flex-col items-center justify-center bg-base-bg p-12 border-r border-base-border">
       <div className="flex flex-col gap-4 items-center group">
         {isAdmin ? (
           <Suspense
@@ -39,18 +39,18 @@ export const HomeLeftPanel = ({
                 await saveProfileSettings({ [field]: newValue });
               }}
               isAdmin={true}
-              className="text-4xl sm:text-5xl text-content-primary transition-all duration-fast hover:scale-105"
+              className="text-5xl text-content-primary transition-all duration-fast hover:scale-105"
             />
           </Suspense>
         ) : (
-          <h1 className="text-4xl sm:text-5xl text-content-primary transition-all duration-fast hover:scale-105">
+          <h1 className="text-5xl text-content-primary transition-all duration-fast hover:scale-105">
             {profileSettings.name}
           </h1>
         )}
         <div className="w-12 h-1 bg-content-primary transition-all duration-fast group-hover:w-24" />
       </div>
 
-      <nav className="hidden lg:block mt-16">
+      <nav className="mt-16">
         <NavLinks activeSectionId={activeSectionId} />
       </nav>
     </aside>
