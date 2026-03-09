@@ -283,7 +283,7 @@ export function HomeRightPanel({
                     initialValue={profileSettings.aboutMeText}
                     onSave={handleSave}
                     isAdmin={isAdmin}
-                    className="text-content-secondary mb-8 md:mb-12 text-base md:text-lg font-light leading-relaxed profile-summary"
+                    className="text-content-secondary mb-8 md:mb-32 text-base md:text-lg font-light leading-relaxed profile-summary"
                   />
                 </Suspense>
               ) : (
@@ -360,7 +360,7 @@ export function HomeRightPanel({
                 } as React.CSSProperties
               }
             >
-              <div className="flex w-fit h-full px-6 md:px-0 md:pl-(--layout-side-margin) md:pr-(--layout-side-margin) lg:px-0 lg:w-full py-2 lg:py-4 items-stretch">
+              <div className="flex w-fit h-full px-6 py-4 md:px-0 md:pl-(--layout-side-margin) md:pr-(--layout-side-margin) lg:px-0 lg:w-full lg:py-4 items-stretch">
                 <ProjectListSection
                   projects={displayProjects}
                   isAdmin={isAdmin}

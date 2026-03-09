@@ -97,12 +97,12 @@ export const ProjectCard = ({
 
   return (
     <div
-      className={`bg-base-bg transition-all duration-normal overflow-hidden border ${borderColorClass} flex flex-col [@media(max-height:500px)]:flex-row h-full relative group ${className}`}
+      className={`bg-base-bg transition-all duration-normal overflow-hidden border ${borderColorClass} flex flex-col [@media(max-width:1023px)_and_(max-height:499px)]:flex-row h-full relative group ${className}`}
       style={style}
     >
       {statusBadge}
 
-      <div className="flex flex-col w-full shrink-0 header-border overflow-hidden bg-base-surface/20 [@media(max-height:500px)]:w-[42%] [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r border-base-border">
+      <div className="flex flex-col w-full shrink-0 header-border overflow-hidden bg-base-surface/20 [@media(max-width:1023px)_and_(max-height:499px)]:w-[42%] [@media(max-width:1023px)_and_(max-height:499px)]:border-b-0 [@media(max-width:1023px)_and_(max-height:499px)]:border-r border-base-border">
         <div className="aspect-video lg:aspect-auto lg:h-(--project-card-image-height) w-full relative overflow-hidden shrink-0 header-border">
           {isValidImageSrc ? (
             <Image
@@ -111,7 +111,7 @@ export const ProjectCard = ({
               fill
               priority={isLCP}
               className="scale-100 grayscale transition-all duration-slow ease-out group-hover:scale-105 group-hover:grayscale-0 object-cover object-[center_40%]"
-              sizes="(max-width: 1024px) 100vw, 33vw"
+              sizes="(max-width: 1023px) 100vw, 33vw"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-base-surface">
@@ -122,8 +122,8 @@ export const ProjectCard = ({
           )}
         </div>
 
-        <div className="p-4 lg:p-6 flex flex-col justify-start lg:flex-initial shrink-0 min-h-18">
-          <div className="flex items-center gap-x-2 mb-2 min-h-6">
+        <div className="p-4 lg:px-6 flex flex-col justify-start lg:flex-initial shrink-0">
+          <div className="flex items-center gap-x-2 mb-2">
             <span className="shrink-0 text-meta font-mono text-content-primary bg-base-surface px-1.5 py-0.5 uppercase tracking-nav border border-base-border">
               {industry || "\u00A0"}
             </span>
@@ -135,15 +135,15 @@ export const ProjectCard = ({
               )}
             </div>
           </div>
-          <h3 className="text-lg lg:text-xl leading-tight font-heading font-bold text-content-primary uppercase tracking-heading line-clamp-2 min-h-10">
+          <h3 className="text-lg lg:text-xl leading-tight font-heading font-bold text-content-primary uppercase tracking-heading line-clamp-2">
             {title || "\u00A0"}
           </h3>
         </div>
       </div>
 
-      <div className="p-5 lg:p-6 flex flex-col flex-1 min-h-0 bg-base-bg overflow-hidden">
-        <div className="shrink-0 mb-(--project-card-gap,1.5rem) min-h-30">
-          <p className="text-layer-medium text-sm lg:text-card-body leading-relaxed font-light line-clamp-5 whitespace-pre-wrap">
+      <div className="p-4 lg:py-2 flex flex-col flex-1 min-h-0 bg-base-bg overflow-hidden">
+        <div className="shrink-0 mb-(--project-card-gap,1.5rem)">
+          <p className="text-start text-layer-medium text-sm lg:text-card-body leading-relaxed font-light line-clamp-3 [@media(min-height:600px)]:line-clamp-5 whitespace-pre-wrap">
             {summary || "\u00A0"}
           </p>
         </div>
