@@ -9,7 +9,7 @@ export type ButtonVariant =
   | "dashed";
 
 const BASE =
-  "text-tiny font-mono uppercase tracking-nav transition-colors duration-fast disabled:cursor-not-allowed";
+  "btn-font transition-colors duration-fast disabled:cursor-not-allowed";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:

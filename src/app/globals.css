@@ -228,6 +228,12 @@
    ========================================================================== */
 @layer components {
   /* ---------- Typography ---------- */
+  /* Button font: text-* と競合しないよう text- で始めない（tailwind-merge 対策） */
+  .btn-font {
+    font-size: var(--text-xs);
+    @apply font-mono uppercase tracking-nav;
+  }
+
   .text-xs-mono {
     font-size: var(--text-xs);
     @apply font-mono uppercase tracking-nav;
