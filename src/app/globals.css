@@ -93,6 +93,7 @@
 
     /* Project card vertical rhythm (used on desktop works section) */
     --project-card-image-height: 320px;
+    --project-card-image-height-mobile: clamp(60px, 16svh, 150px);
     --project-card-gap: 1.5rem;
 
     /* Typography */

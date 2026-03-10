@@ -23,7 +23,7 @@ export function HomeLeftPanelWithObserver({
     const scrollEl = document.getElementById(MAIN_SCROLL_ID);
     if (!scrollEl) return;
 
-    const observedIds = new Set<string>();
+    const observedElements = new WeakSet<Element>();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -44,11 +44,16 @@ export function HomeLeftPanelWithObserver({
     const observeSections = () => {
       const sections = scrollEl.querySelectorAll("section[id]");
       sections.forEach((section) => {
+        const isVisible =
+          section instanceof HTMLElement &&
+          section.offsetParent !== null &&
+          (section as HTMLElement).getBoundingClientRect().height > 0;
         if (
           SECTIONS.includes(section.id as SectionId) &&
-          !observedIds.has(section.id)
+          !observedElements.has(section) &&
+          isVisible
         ) {
-          observedIds.add(section.id);
+          observedElements.add(section);
           observer.observe(section);
         }
       });

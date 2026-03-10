@@ -135,7 +135,7 @@ export function HeaderClient({ sections }: HeaderClientProps) {
             variant="secondary"
             onClick={handleLogout}
             disabled={loading}
-            className="h-8 px-4"
+            className="h-7 px-3 text-xs-mono"
           >
             {loading ? "..." : "Logout"}
           </Button>

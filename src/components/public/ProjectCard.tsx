@@ -103,7 +103,7 @@ export const ProjectCard = ({
       {statusBadge}
 
       <div className="flex flex-col w-full shrink-0 header-border overflow-hidden bg-base-surface/20 [@media(max-width:1023px)_and_(max-height:499px)]:w-[42%] [@media(max-width:1023px)_and_(max-height:499px)]:border-b-0 [@media(max-width:1023px)_and_(max-height:499px)]:border-r border-base-border">
-        <div className="aspect-video lg:aspect-auto lg:h-(--project-card-image-height) w-full relative overflow-hidden shrink-0 header-border">
+        <div className="h-(--project-card-image-height-mobile) lg:aspect-auto lg:h-(--project-card-image-height) w-full relative overflow-hidden shrink-0 header-border">
           {isValidImageSrc ? (
             <Image
               src={imageSrc as string}
