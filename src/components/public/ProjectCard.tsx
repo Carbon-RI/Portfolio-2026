@@ -70,8 +70,8 @@ export const ProjectCard = ({
       },
       Unpublished: {
         label: "Private",
-        bg: "bg-layer-muted text-base-bg",
-        border: "border-base-border",
+        bg: "bg-slate-600 text-white",
+        border: "border-slate-600",
       },
       Deleted: {
         label: "Deleted",

@@ -129,5 +129,5 @@ export const getProjectStatus = (project: {
 }): ProjectStatus => {
   if (project.is_deleted) return "Deleted";
   if (project.published) return project.draft ? "DraftModified" : "Published";
-  return project.draft ? "NewDraft" : "Unpublished";
+  return "Unpublished";
 };

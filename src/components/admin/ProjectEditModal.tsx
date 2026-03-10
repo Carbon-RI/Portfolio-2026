@@ -33,7 +33,7 @@ export const ProjectEditModal = ({
   const router = useRouter();
   const [confirmState, setConfirmState] = useState<{
     isOpen: boolean;
-    mode: "publish" | "delete" | null;
+    mode: "publish" | "unpublish" | "delete" | null;
   }>({ isOpen: false, mode: null });
 
   const [hasSavedDuringSession, setHasSavedDuringSession] = useState(false);
@@ -84,7 +84,7 @@ export const ProjectEditModal = ({
   ]);
 
   const executeAction = useCallback(
-    async (mode: "draft" | "publish"): Promise<string | null> => {
+    async (mode: "draft" | "publish" | "unpublish"): Promise<string | null> => {
       const result = await save(mode);
       if (!result.success) {
         toast.error(result.error.message);
@@ -93,7 +93,7 @@ export const ProjectEditModal = ({
 
       await onProjectDataChange();
 
-      if (mode === "publish") {
+      if (mode === "publish" || mode === "unpublish") {
         onClose();
       } else {
         setHasSavedDuringSession(true);
@@ -151,6 +151,21 @@ export const ProjectEditModal = ({
                 <span className={statusDisplay.className}>
                   {statusDisplay.label}
                 </span>
+                {editorStatus === "Published" && (
+                  <>
+                    <span className="text-layer-subtle">|</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setConfirmState({ isOpen: true, mode: "unpublish" })
+                      }
+                      className="text-xs-mono text-accent-2 px-2 py-0.5 border border-accent-2/50 hover:bg-accent-2/10 transition-all disabled:opacity-30"
+                      disabled={isUploading}
+                    >
+                      Unpublish
+                    </button>
+                  </>
+                )}
                 {(isDirty || showSavedText) && (
                   <>
                     <span className="text-layer-subtle">|</span>
@@ -247,21 +262,30 @@ export const ProjectEditModal = ({
         title={
           confirmState.mode === "delete"
             ? "Confirm Deletion"
-            : "Confirm Publication"
+            : confirmState.mode === "unpublish"
+              ? "Confirm Unpublish"
+              : "Confirm Publication"
         }
         message={
           confirmState.mode === "delete"
             ? "This action will permanently delete the project draft."
-            : "Ready to make this project public?"
+            : confirmState.mode === "unpublish"
+              ? "This project will be hidden from the public. You can publish again anytime."
+              : "Ready to make this project public?"
         }
         confirmLabel={
-          confirmState.mode === "delete" ? "Delete Now" : "Publish Now"
+          confirmState.mode === "delete"
+            ? "Delete Now"
+            : confirmState.mode === "unpublish"
+              ? "Unpublish"
+              : "Publish Now"
         }
         variant={confirmState.mode === "delete" ? "danger" : "primary"}
         onConfirm={async () => {
           const { mode } = confirmState;
           setConfirmState({ isOpen: false, mode: null });
           if (mode === "publish") await executeAction("publish");
+          else if (mode === "unpublish") await executeAction("unpublish");
           else if (mode === "delete") {
             await onDelete(initialProject.id);
             onProjectDataChange();
