@@ -85,6 +85,7 @@ export const getPublishedProjects = unstable_cache(
 
 export const getAllProjects = async (): Promise<Result<FullProjectData[]>> => {
   try {
+    await unwrap(await verifyAdminSession());
     const snap = await getAdminDb()
       .collection(FB_COLLECTIONS.PROJECTS)
       .where("is_deleted", "==", false)
@@ -96,6 +97,17 @@ export const getAllProjects = async (): Promise<Result<FullProjectData[]>> => {
     );
   }
 };
+
+export async function generateNewProjectId(): Promise<Result<string>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    return success(crypto.randomUUID());
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : new Error("Failed to generate project ID")
+    );
+  }
+}
 
 // --- Actions (Server Actions) ---
 export async function saveProjectDraft(

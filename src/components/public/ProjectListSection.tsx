@@ -60,11 +60,13 @@ export const ProjectListSection = ({
   const handleNewProject = useCallback(async () => {
     if (!isAdmin) return;
     try {
-      const { doc, collection } = await import("firebase/firestore");
-      const { getDb } = await import("@/lib/firebase/client");
-      const db = getDb();
-      const newDocRef = doc(collection(db, "projects"));
-      onSelectProject(createNewProjectTemplate(newDocRef.id));
+      const { generateNewProjectId } = await import(
+        "@/services/server/project-service"
+      );
+      const result = await generateNewProjectId();
+      if (result.success) {
+        onSelectProject(createNewProjectTemplate(result.data));
+      }
     } catch (error) {
       console.error("Failed to initialize new project:", error);
     }

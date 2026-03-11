@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ==========================================================================
    @theme - Design tokens mapped to Tailwind utilities
@@ -93,7 +94,7 @@
 
     /* Project card vertical rhythm (used on desktop works section) */
     --project-card-image-height: 320px;
-    --project-card-image-height-mobile: clamp(60px, 16svh, 150px);
+    --project-card-image-height-mobile: clamp(110px, 20svh, 320px);
     --project-card-gap: 1.5rem;
 
     /* Typography */
@@ -228,7 +229,7 @@
    ========================================================================== */
 @layer components {
   /* ---------- Typography ---------- */
-  /* Button font: text-* と競合しないよう text- で始めない（tailwind-merge 対策） */
+  /* Button font: avoid starting with text- so it doesn't conflict with text-* (tailwind-merge) */
   .btn-font {
     font-size: var(--text-xs);
     @apply font-mono uppercase tracking-nav;
