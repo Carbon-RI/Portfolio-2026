@@ -249,7 +249,7 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
 
   const save = useCallback(
     async (
-      mode: "draft" | "publish",
+      mode: "draft" | "publish" | "unpublish",
       onSuccess?: (slug: string) => void
     ): Promise<Result<void>> => {
       if (isUploading) return failure("Uploading in progress...");
@@ -273,13 +273,17 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
 
       setIsUploading(true);
       try {
-        const { saveProjectDraft, publishProject } = await import(
-          "@/services/server/project-service"
-        );
+        const {
+          saveProjectDraft,
+          publishProject,
+          unpublishProject,
+        } = await import("@/services/server/project-service");
         const result =
           mode === "draft"
             ? await saveProjectDraft(id, contentFields as Partial<FullProjectData>)
-            : await publishProject(id, contentFields as Partial<FullProjectData>);
+            : mode === "publish"
+              ? await publishProject(id, contentFields as Partial<FullProjectData>)
+              : await unpublishProject(id, contentFields as Partial<FullProjectData>);
 
         if (result.success && onSuccess) onSuccess(slug);
         return result.success

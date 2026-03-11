@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["react-icons", "firebase"],
+    inlineCss: true,
   },
   compiler: {
     removeConsole:

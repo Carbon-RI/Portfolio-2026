@@ -57,9 +57,15 @@ export async function verifyAdminSession(): Promise<Result<DecodedIdToken>> {
 
     return success(decodedToken);
   } catch (error) {
-    console.error("Admin Session Verification Failed:", error);
+    const code = (error as { code?: string })?.code;
+    const isExpected =
+      code === "auth/session-cookie-revoked" ||
+      code === "auth/session-cookie-expired";
+    if (!isExpected) {
+      console.error("Admin Session Verification Failed:", error);
+    }
     return failure<DecodedIdToken>(
-      error instanceof Error ? error : "Invalid session."
+      error instanceof Error ? error.message : "Invalid session."
     );
   }
 }

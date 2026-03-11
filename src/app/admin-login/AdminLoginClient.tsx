@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/shared/Button";
 
 export const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export const AdminLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="app-input-full"
+              className="app-input"
               placeholder="admin@example.com"
             />
           </div>
@@ -88,18 +89,19 @@ export const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="app-input-full"
+              className="app-input"
               placeholder="********"
             />
           </div>
 
-          <button
+          <Button
+            variant="primary"
             type="submit"
             disabled={loading}
-            className="w-full btn-primary disabled:opacity-50"
+            className="w-full"
           >
             {loading ? "Authenticating..." : "Sign In with Email"}
-          </button>
+          </Button>
         </form>
 
         <div className="relative flex items-center justify-center my-8">

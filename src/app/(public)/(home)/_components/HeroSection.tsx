@@ -1,3 +1,5 @@
+import { SectionView } from "@/components/layout/SectionView";
+
 /**
  * Server Component: Hero (Welcome) section for initial LCP.
  * Rendered in initial HTML to avoid JS-dependent LCP delay.
@@ -12,10 +14,10 @@ export function HeroSection({
   welcomeMessageText,
 }: HeroSectionProps) {
   return (
-    <section
+    <SectionView
       id="welcome"
       aria-label="Welcome Section"
-      className="section-view-no-py flex items-center shrink-0 min-h-section lg:min-h-0 lg:h-full scroll-mt-(--header-height) lg:scroll-mt-0"
+      className="shrink-0 min-h-section lg:min-h-section-desktop lg:h-full"
       style={
         {
           contentVisibility: "visible",
@@ -31,6 +33,6 @@ export function HeroSection({
           {welcomeMessageText}
         </p>
       </div>
-    </section>
+    </SectionView>
   );
 }

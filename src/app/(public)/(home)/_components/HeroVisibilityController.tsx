@@ -4,8 +4,9 @@ import React, { ReactNode } from "react";
 import { useAuth } from "@/context/auth-context";
 
 /**
- * Minimal Client wrapper: hides Hero when admin (avoids duplicate Welcome section).
- * Uses display:none to avoid CLS. Hero is Server-rendered for LCP.
+ * Minimal Client wrapper: omits Hero when admin to avoid duplicate id="welcome".
+ * Non-admin: Hero (Server-rendered for LCP) is the only welcome section.
+ * Admin: HomeRightPanel's SectionView id="welcome" is the sole welcome section.
  */
 export function HeroVisibilityController({
   children,
@@ -13,7 +14,6 @@ export function HeroVisibilityController({
   children: ReactNode;
 }) {
   const { isAdmin } = useAuth();
-  return (
-    <div style={{ display: isAdmin ? "none" : "block" }}>{children}</div>
-  );
+  if (isAdmin) return null;
+  return <>{children}</>;
 }

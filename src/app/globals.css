@@ -27,13 +27,21 @@
   --font-mono: var(--font-jetbrains), monospace;
   --font-body: var(--font-jakarta), sans-serif;
 
-  /* Font Sizes (maps to text-tiny / text-xxs utility classes) */
-  --text-tiny: 10px;
-  --text-xxs: 11px;
+  /* Font Sizes (references :root, creates text-* utilities) */
+  --text-tiny: var(--text-xs);
+  --text-xxs: var(--text-sm);
+  --text-card-body: var(--text-md);
 
   /* Letter Spacing */
   --tracking-heading: 0.3em;
   --tracking-nav: 0.4em;
+
+  /* Container/Size (for max-w-100 truncation) */
+  --container-100: 25rem;
+
+  /* Section heights (for min-h-section utility) */
+  --min-height-section: var(--content-height-no-footer);
+  --min-height-section-desktop: var(--content-height);
 }
 
 /* ==========================================================================
@@ -82,19 +90,19 @@
     /* Desktop cards use a fixed width for consistent layout */
     --card-width-lg: 500px;
     --card-width: var(--card-width-mobile);
-    --card-max-height-sm: 180px;
-    --card-max-height-lg: 220px;
 
     /* Project card vertical rhythm (used on desktop works section) */
     --project-card-image-height: 320px;
+    --project-card-image-height-mobile: clamp(60px, 16svh, 150px);
     --project-card-gap: 1.5rem;
 
     /* Typography */
+    --text-micro-size: 8px;
+    --text-meta-size: 9px;
     --text-xs: 10px;
     --text-sm: 11px;
     --text-base: 12px;
-    --text-meta-size: 9px;
-    --text-micro-size: 8px;
+    --text-md: 15px; /* card body, summary (between base and lg) */
 
     /* Borders & Transitions */
     --border-thin: 1px;
@@ -108,7 +116,6 @@
     /* Icon Sizes */
     --icon-xs: 1em;
     --icon-sm: 1.5rem;
-    --icon-md: 2.5rem;
   }
 
   @media (min-width: 768px) {
@@ -157,6 +164,40 @@
     }
   }
 
+  /* Profile section - line-clamp by viewport height */
+  @media (max-height: 599px) {
+    section#profile p {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+  }
+  @media (min-height: 600px) and (max-height: 799px) {
+    section#profile p {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 7;
+      overflow: hidden;
+    }
+  }
+  @media (min-height: 800px) and (max-height: 999px) {
+    section#profile p {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 10;
+      overflow: hidden;
+    }
+  }
+  @media (min-height: 1000px) {
+    section#profile p {
+      display: block;
+      -webkit-line-clamp: unset;
+      -webkit-box-orient: unset;
+      overflow: visible;
+    }
+  }
+
   /* Support for mobile landscape orientation and short viewports (max-height: 500px). */
   @media screen and (max-height: 500px) {
     :root {
@@ -186,44 +227,13 @@
    Components - Layout, Typography, UI Elements
    ========================================================================== */
 @layer components {
-  /* ---------- Layout ---------- */
-  .side-panel-left {
-    @apply w-full flex flex-col items-center bg-base-bg p-8 border-b border-base-border
-           lg:fixed lg:w-1/2 lg:h-svh lg:justify-center lg:p-12 lg:border-r lg:border-b-0;
-  }
-
-  .section-view {
-    min-height: auto;
-    scroll-margin-top: var(--header-height);
-    @apply flex flex-col justify-center items-center px-4 py-20 text-center bg-base-bg transition-all
-           lg:py-24;
-    transition-duration: var(--transition-fast);
-    @media (min-width: 1024px) {
-      min-height: var(--content-height-no-footer);
-    }
-  }
-
-  .section-view-no-py {
-    min-height: auto;
-    scroll-margin-top: var(--header-height);
-    padding-top: 0;
-    padding-bottom: 0;
-    @apply flex flex-col justify-center items-center px-4 text-center bg-base-bg transition-all;
-    transition-duration: var(--transition-fast);
-    @media (min-width: 1024px) {
-      min-height: var(--content-height-no-footer);
-    }
-  }
-
-  /* Support for mobile landscape orientation and short viewports (max-height: 500px). */
-  @media screen and (max-height: 500px) {
-    section.section-view {
-      min-height: var(--content-height-no-footer);
-      @apply py-12 justify-start;
-    }
-  }
-
   /* ---------- Typography ---------- */
+  /* Button font: text-* と競合しないよう text- で始めない（tailwind-merge 対策） */
+  .btn-font {
+    font-size: var(--text-xs);
+    @apply font-mono uppercase tracking-nav;
+  }
+
   .text-xs-mono {
     font-size: var(--text-xs);
     @apply font-mono uppercase tracking-nav;
@@ -232,11 +242,6 @@
   .text-sm-mono {
     font-size: var(--text-sm);
     @apply font-mono uppercase tracking-wider;
-  }
-
-  .text-base-mono {
-    font-size: var(--text-base);
-    @apply font-mono uppercase tracking-nav;
   }
 
   /* ---------- UI: Navigation ---------- */
@@ -250,23 +255,9 @@
     @apply absolute -left-8 w-1 h-1 bg-content-primary rounded-full;
   }
 
-  .interactive-item {
-    @apply text-layer-medium hover:text-content-primary cursor-pointer;
-    transition: all var(--transition-normal);
-  }
-
   .tag-label {
     font-size: var(--text-base);
     @apply font-mono uppercase tracking-nav px-3 py-1.5 border border-base-border text-layer-high;
-  }
-
-  /* Prevents long descriptions from breaking card layout while retaining sufficient context. */
-  .dynamic-line-clamp {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-clamp: 10;
-    -webkit-line-clamp: 10;
   }
 
   /* ---------- UI: Forms ---------- */
@@ -281,74 +272,13 @@
   }
 
   .app-input {
-    @apply bg-base-bg border border-base-border p-4 text-content-primary text-sm focus:outline-none focus:border-content-primary;
-    transition: all var(--transition-normal);
-  }
-
-  .app-input-full {
     @apply w-full bg-base-bg border border-base-border p-4 text-content-primary text-sm focus:outline-none focus:border-content-primary;
     transition: all var(--transition-normal);
-  }
-
-  /* ---------- UI: Buttons ---------- */
-  .btn-base {
-    font-size: var(--text-xs);
-    @apply font-mono uppercase tracking-nav transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
-    transition-duration: var(--transition-fast);
-  }
-
-  .btn-primary {
-    font-size: var(--text-xs);
-    @apply font-mono uppercase tracking-nav transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-           bg-content-primary text-base-bg font-bold px-8 py-4 hover:bg-content-secondary;
-    transition-duration: var(--transition-fast);
-  }
-
-  .btn-secondary {
-    font-size: var(--text-xs);
-    @apply font-mono uppercase tracking-nav transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-           px-3 py-2 border border-layer-muted text-layer-medium hover:bg-layer-faint;
-    transition-duration: var(--transition-fast);
-  }
-
-  .btn-outline {
-    font-size: var(--text-xs);
-    @apply font-mono uppercase tracking-nav transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-           px-3 py-2 border border-layer-muted hover:bg-layer-faint;
-    transition-duration: var(--transition-fast);
-  }
-
-  .btn-add-dashed {
-    font-size: var(--text-xs);
-    @apply font-mono uppercase tracking-nav transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-           w-full border border-dashed border-base-border text-layer-medium
-           hover:text-content-primary hover:border-content-primary hover:bg-layer-faint;
-    transition-duration: var(--transition-fast);
   }
 
   /* ---------- UI: Containers ---------- */
   .surface-container {
     @apply bg-base-surface border border-base-border;
-  }
-
-  .modal-overlay {
-    @apply fixed inset-0 bg-base-bg flex items-center justify-center p-4;
-    z-index: var(--z-modal);
-  }
-
-  .modal-content-md {
-    @apply bg-base-surface border border-base-border w-full max-w-5xl;
-  }
-
-  .modal-header {
-    @apply p-6 flex justify-between items-center bg-base-surface sticky top-0;
-    border-bottom: var(--border-thin) solid var(--base-border);
-    z-index: var(--z-sticky);
-  }
-
-  .modal-footer {
-    @apply p-6 flex justify-end gap-4;
-    border-top: var(--border-thin) solid var(--base-border);
   }
 
   .container-responsive {
@@ -366,11 +296,6 @@
   }
 
   /* ---------- UI: Alerts ---------- */
-  .alert-message {
-    font-size: var(--text-xs);
-    @apply p-4 bg-layer-faint border border-layer-muted uppercase tracking-nav;
-  }
-
   .alert-error {
     font-size: var(--text-xs);
     @apply p-4 bg-layer-faint border border-layer-muted uppercase tracking-nav text-accent-2;
@@ -390,21 +315,6 @@
   .icon-sm {
     width: var(--icon-sm);
     height: var(--icon-sm);
-  }
-
-  .icon-md {
-    width: var(--icon-md);
-    height: var(--icon-md);
-  }
-
-  /* ---------- UI: Images ---------- */
-  .image-card-height {
-    max-height: var(--card-max-height-sm);
-  }
-  @media (min-width: 1024px) {
-    .image-card-height {
-      max-height: var(--card-max-height-lg);
-    }
   }
 }
 
@@ -428,14 +338,6 @@
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-  }
-
-  .min-h-section {
-    min-height: var(--content-height-no-footer);
-  }
-
-  .max-h-90 {
-    max-height: var(--vh-90);
   }
 
   /* 9px: card meta / small labels */

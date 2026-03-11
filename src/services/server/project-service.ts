@@ -176,6 +176,46 @@ export async function publishProject(
   }
 }
 
+export async function unpublishProject(
+  projectId: string,
+  fields: Partial<FullProjectData>
+): Promise<Result<void>> {
+  try {
+    await unwrap(await verifyAdminSession());
+    const validated = projectSchema.partial().safeParse(fields);
+    if (!validated.success)
+      return failure(
+        validated.error.issues[0]?.message ?? "Invalid data"
+      );
+
+    const { draft, ...rootFields } = fields;
+    void draft;
+    if (!rootFields.slug) return failure("Slug is required.");
+
+    await getAdminDb()
+      .collection(FB_COLLECTIONS.PROJECTS)
+      .doc(projectId)
+      .set(
+        {
+          ...cleanFields(rootFields as ProjectSaveData),
+          published: false,
+          is_deleted: false,
+          showDetail: rootFields.showDetail ?? false,
+          draft: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+    refreshProjectCache(rootFields.slug);
+    return success(undefined);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error : new Error("Failed to unpublish")
+    );
+  }
+}
+
 export async function softDeleteProject(
   projectId: string,
   slug?: string

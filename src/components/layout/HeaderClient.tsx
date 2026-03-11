@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { LG_QUERY, SCROLL_CONFIG, type SectionId } from "@/types";
+import { Button } from "@/components/shared/Button";
 
 interface HeaderClientProps {
   sections: readonly SectionId[];
 }
 
 export function HeaderClient({ sections }: HeaderClientProps) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, refreshSession } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState<SectionId>("welcome");
   const router = useRouter();
@@ -92,6 +93,7 @@ export function HeaderClient({ sections }: HeaderClientProps) {
     try {
       const { logout } = await import("@/services/client/auth-service");
       await logout();
+      await refreshSession();
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
@@ -130,13 +132,14 @@ export function HeaderClient({ sections }: HeaderClientProps) {
 
       <div className="flex-1 flex justify-end">
         {isAdmin ? (
-          <button
+          <Button
+            variant="secondary"
             onClick={handleLogout}
             disabled={loading}
-            className="btn-secondary h-8 px-4"
+            className="h-7 px-3 text-xs-mono"
           >
             {loading ? "..." : "Logout"}
-          </button>
+          </Button>
         ) : (
           <Link
             href="/admin-login"

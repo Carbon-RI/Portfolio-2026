@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ProjectSection, ProjectMedia } from "@/types";
+import { Button } from "@/components/shared/Button";
 
 interface ProjectDetailEditorProps {
   sections: ProjectSection[];
@@ -176,14 +177,14 @@ const SectionItem = ({
           placeholder="Heading"
           value={section.heading}
           onChange={(e) => onUpdateField("heading", e.target.value)}
-          className="w-full app-input-full text-lg"
+          className="app-input text-lg"
         />
         <textarea
           placeholder="Content (Markdown supported)"
           value={section.content}
           onChange={(e) => onUpdateField("content", e.target.value)}
           rows={6}
-          className="w-full app-input-full font-mono text-sm leading-relaxed resize-y"
+          className="app-input font-mono text-sm leading-relaxed resize-y"
         />
 
         <div className="space-y-4 pt-4 border-t border-base-border/50">
@@ -200,12 +201,13 @@ const SectionItem = ({
             />
           ))}
 
-          <button
+          <Button
+            variant="dashed"
             onClick={onAddMedia}
-            className="btn-add-dashed py-3 text-xs-mono"
+            className="py-3"
           >
             + Add Media Item
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -260,9 +262,9 @@ export const ProjectDetailEditor = ({
         />
       ))}
 
-      <button onClick={addSection} className="btn-add-dashed py-8 text-sm-mono">
+      <Button variant="dashed" onClick={addSection} className="py-8 text-xxs tracking-wider">
         + Add New Content Section
-      </button>
+      </Button>
     </div>
   );
 };
