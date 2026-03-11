@@ -107,7 +107,7 @@ const ProjectSection = ({
 
       <div className="prose prose-invert max-w-none">
         <ReactMarkdown components={markdownComponents}>
-          {section.content}
+          {section.content ?? ""}
         </ReactMarkdown>
       </div>
     </div>
@@ -121,7 +121,11 @@ export const ProjectContentClient = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const isFromBasicInfo = searchParams.get("edit") === "true";
-  const [project] = useState<FullProjectData>(initialProject);
+  const [project, setProject] = useState<FullProjectData>(initialProject);
+
+  useEffect(() => {
+    setProject(initialProject);
+  }, [initialProject]);
   const [isEditMode, setIsEditMode] = useState(isAdmin && isFromBasicInfo);
 
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);

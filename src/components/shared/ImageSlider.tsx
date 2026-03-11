@@ -83,24 +83,26 @@ export const ImageSlider = ({
 
       {validMedia.length > 1 && (
         <>
-          <nav aria-label="Media navigation">
+          <nav aria-label="Media navigation" className="pointer-events-none">
             <button
               onClick={handlePrev}
-              className="absolute left-0 inset-y-0 w-1/4 flex items-center justify-start pl-8 z-10
-                         bg-linear-to-r from-base-bg/40 to-transparent
-                         opacity-0 group-hover:opacity-100 transition-all duration-normal cursor-pointer"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full
+                         surface-container border border-base-border
+                         opacity-0 group-hover:opacity-100 transition-all duration-normal cursor-pointer pointer-events-auto
+                         hover:bg-base-bg/80"
             >
-              <span className="text-content-primary text-3xl font-light scale-y-150">
+              <span className="text-content-primary text-2xl font-light scale-y-150">
                 &larr;
               </span>
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-0 inset-y-0 w-1/4 flex items-center justify-end pr-8 z-10
-                         bg-linear-to-l from-base-bg/40 to-transparent
-                         opacity-0 group-hover:opacity-100 transition-all duration-normal cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full
+                         surface-container border border-base-border
+                         opacity-0 group-hover:opacity-100 transition-all duration-normal cursor-pointer pointer-events-auto
+                         hover:bg-base-bg/80"
             >
-              <span className="text-content-primary text-3xl font-light scale-y-150">
+              <span className="text-content-primary text-2xl font-light scale-y-150">
                 &rarr;
               </span>
             </button>
