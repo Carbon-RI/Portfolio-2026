@@ -5,87 +5,52 @@ import React, {
   useContext,
   useEffect,
   useState,
-  useRef,
+  useCallback,
   ReactNode,
 } from "react";
-import type { User, Unsubscribe } from "firebase/auth";
 
 interface AuthContextType {
-  user: User | null;
+  user: null;
   loading: boolean;
   isAdmin: boolean;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /**
- * Defer Firebase init until after first paint (requestIdleCallback).
- * Firebase auth/iframe.js was blocking the critical path (412ms, 90KB).
- * @returns cleanup function
+ * Session-first auth: does NOT load Firebase on initial page load.
+ * Firebase Auth (auth/iframe.js ~90KB) is only loaded when user clicks Login
+ * and submits credentials. This keeps Firebase off the critical path for LCP.
  */
-function deferAfterLCP(fn: () => void): () => void {
-  if (typeof window === "undefined") return () => {};
-  let id: number | ReturnType<typeof setTimeout>;
-  if ("requestIdleCallback" in window) {
-    id = (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(fn, { timeout: 800 });
-  } else {
-    id = setTimeout(fn, 100);
-  }
-  return () => {
-    if ("cancelIdleCallback" in window) {
-      (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id as number);
-    } else {
-      clearTimeout(id as ReturnType<typeof setTimeout>);
-    }
-  };
-}
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const unsubRef = useRef<Unsubscribe | null>(null);
+
+  const refreshSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/session");
+      const data = await res.json();
+      setIsAdmin(!!data?.isAdmin);
+    } catch {
+      setIsAdmin(false);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
-    const initAuth = async () => {
-      try {
-        const [{ getFirebaseAuth }, { onAuthStateChanged }] = await Promise.all([
-          import("@/lib/firebase/client").then((m) => ({ getFirebaseAuth: m.getFirebaseAuth })),
-          import("firebase/auth"),
-        ]);
-        const auth = getFirebaseAuth();
-
-        unsubRef.current = onAuthStateChanged(auth, async (currentUser) => {
-          if (!isMounted) return;
-          setUser(currentUser);
-
-          if (currentUser) {
-            const res = await fetch("/api/auth/session");
-            const data = await res.json();
-            if (isMounted) setIsAdmin(!!data.isAdmin);
-          } else {
-            if (isMounted) setIsAdmin(false);
-          }
-          if (isMounted) setLoading(false);
-        });
-      } catch (error) {
-        console.error("Auth init error:", error);
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    const loadCleanup = deferAfterLCP(initAuth);
-
+    refreshSession().finally(() => {
+      if (isMounted) setLoading(false);
+    });
     return () => {
       isMounted = false;
-      loadCleanup?.();
-      unsubRef.current?.();
     };
-  }, []);
+  }, [refreshSession]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin }}>
+    <AuthContext.Provider
+      value={{ user: null, loading, isAdmin, refreshSession }}
+    >
       {children}
     </AuthContext.Provider>
   );

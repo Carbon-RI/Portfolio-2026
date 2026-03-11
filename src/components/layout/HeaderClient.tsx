@@ -12,7 +12,7 @@ interface HeaderClientProps {
 }
 
 export function HeaderClient({ sections }: HeaderClientProps) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, refreshSession } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState<SectionId>("welcome");
   const router = useRouter();
@@ -93,6 +93,7 @@ export function HeaderClient({ sections }: HeaderClientProps) {
     try {
       const { logout } = await import("@/services/client/auth-service");
       await logout();
+      await refreshSession();
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);

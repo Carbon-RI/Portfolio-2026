@@ -102,20 +102,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const firebaseAuthDomain =
-    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ??
-    "my-portfolio-de333.firebaseapp.com";
-
   return (
     <html
       lang="en"
       suppressHydrationWarning
       className={`${oswald.variable} ${jakarta.variable} ${jetbrains.variable}`}
     >
-      <head>
-        <link rel="preconnect" href={`https://${firebaseAuthDomain}`} />
-        <link rel="preconnect" href="https://apis.google.com" crossOrigin="" />
-      </head>
       <body>
         {children}
         <Toaster position="top-right" richColors closeButton />

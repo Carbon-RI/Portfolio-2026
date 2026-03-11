@@ -1,8 +1,8 @@
-import { getFirebaseAuth } from "@/lib/firebase/client";
 import type { User } from "firebase/auth";
 import { Result, success, failure } from "@/types";
 
-export const handlePostLogin = async (user: User): Promise<Result<void>> => {
+/** Only called after login - Firebase is already loaded at that point. */
+const handlePostLogin = async (user: User): Promise<Result<void>> => {
   try {
     const idToken = await user.getIdToken();
     const response = await fetch("/api/auth/login", {
@@ -21,11 +21,16 @@ export const handlePostLogin = async (user: User): Promise<Result<void>> => {
   }
 };
 
+/**
+ * Loads Firebase Auth only when called (login page submit).
+ * Does NOT load Firebase on import - keeps auth/iframe.js off critical path.
+ */
 export const loginWithEmail = async (
   email: string,
   password: string
 ): Promise<Result<void>> => {
   try {
+    const { getFirebaseAuth } = await import("@/lib/firebase/client");
     const { signInWithEmailAndPassword } = await import("firebase/auth");
     const auth = getFirebaseAuth();
     const userCredential = await signInWithEmailAndPassword(
@@ -39,8 +44,13 @@ export const loginWithEmail = async (
   }
 };
 
+/**
+ * Loads Firebase Auth only when called (login page submit).
+ * Does NOT load Firebase on import - keeps auth/iframe.js off critical path.
+ */
 export const loginWithGoogle = async (): Promise<Result<void>> => {
   try {
+    const { getFirebaseAuth } = await import("@/lib/firebase/client");
     const { GoogleAuthProvider, signInWithPopup } = await import(
       "firebase/auth"
     );
@@ -57,14 +67,13 @@ export const loginWithGoogle = async (): Promise<Result<void>> => {
   }
 };
 
+/**
+ * Clears server session only. Does NOT load Firebase.
+ * Firebase signOut is skipped to avoid loading auth/iframe.js for logout.
+ */
 export const logout = async (): Promise<void> => {
   try {
-    const { signOut } = await import("firebase/auth");
-    const auth = getFirebaseAuth();
-    await Promise.all([
-      signOut(auth),
-      fetch("/api/auth/logout", { method: "POST" }),
-    ]);
+    await fetch("/api/auth/logout", { method: "POST" });
   } catch (error) {
     console.error("Logout error:", error);
   }

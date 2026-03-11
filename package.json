@@ -44,9 +44,11 @@
     "typescript": "^5.9.3"
   },
   "browserslist": [
-    "last 2 years",
-    "not dead",
-    "> 0.2%"
+    "Chrome >= 100",
+    "Firefox >= 100",
+    "Safari >= 15.4",
+    "Edge >= 100",
+    "not dead"
   ],
   "overrides": {
     "minimatch": "^10.2.1"
