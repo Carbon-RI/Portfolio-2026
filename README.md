@@ -1,6 +1,6 @@
 # My Portfolio
 
-> A senior engineer portfolio site. A Next.js 16 SPA with Firebase backend and an admin panel built around a Draft/Publish workflow.
+> A Next.js 16 portfolio project focusing on clean architecture and robust CMS workflows.
 
 ---
 
@@ -150,6 +150,27 @@ npm run build
 npm run test
 npm run test -- --coverage
 ```
+
+### Docker (Local Development)
+
+The project is Dockerized so others can run it locally without manual setup.
+
+**Prerequisites**: Install [Docker](https://docs.docker.com/get-docker/).
+
+**Steps**:
+
+1. Clone the repository and move to the project root
+2. Copy `.env.example` to `.env.local` and fill in Firebase and email settings
+3. Start the app:
+
+```bash
+docker compose up
+```
+
+Open http://localhost:3000 in your browser. Source changes are reflected immediately via hot reload.
+
+- Run in background: `docker compose up -d`
+- Stop: `docker compose down`
 
 ---
 

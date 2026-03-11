@@ -23,9 +23,9 @@ export async function getRegisteredAdminUid(): Promise<Result<string>> {
     }
     return success(adminUid);
   } catch (error) {
-    console.error("Firestore Admin Access Error:", error);
+    console.error("Firestore Admin Read Error:", error);
     return failure<string>(
-      error instanceof Error ? error : "Unknown Firestore error"
+      error instanceof Error ? error : new Error("Unknown Firestore error")
     );
   }
 }
@@ -50,8 +50,7 @@ export async function verifyAdminSession(): Promise<Result<DecodedIdToken>> {
       return failure<DecodedIdToken>(adminUidResult.error);
     }
 
-    if (decodedToken.uid !== adminUidResult.data) {
-      console.warn(`Unauthorized access attempt by UID: ${decodedToken.uid}`);
+    if (adminUidResult.data !== decodedToken.uid) {
       return failure<DecodedIdToken>("UID mismatch: Unauthorized.");
     }
 

@@ -1,8 +1,4 @@
-import {
-  getFirebaseStorage,
-  getFirebaseApp,
-} from "@/lib/firebase/client";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirebaseApp } from "@/lib/firebase/client";
 import {
   FullProjectData,
   Result,
@@ -12,19 +8,32 @@ import {
 import { mapToFullData } from "@/services/utils/project-converter";
 import { FB_COLLECTIONS } from "@/lib/constants";
 
+async function uploadViaApi(
+  projectId: string,
+  file: File,
+  type: "image" | "video"
+): Promise<Result<string>> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", type);
+  const res = await fetch(`/api/projects/${encodeURIComponent(projectId)}/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) return failure(data.error ?? "Upload failed");
+  if (!data.success || !data.url) return failure("Invalid response from server");
+  return success(data.url);
+}
+
 export const uploadImageToStorage = async (
   projectId: string,
   file: File
 ): Promise<Result<string>> => {
   try {
-    const storage = getFirebaseStorage();
-    const fileName = `${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, `projects/${projectId}/images/${fileName}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    return success(downloadUrl);
+    return uploadViaApi(projectId, file, "image");
   } catch (error) {
-    return failure(error instanceof Error ? error : "Failed to upload image");
+    return failure(error instanceof Error ? error.message : "Failed to upload image");
   }
 };
 
@@ -33,15 +42,9 @@ export const uploadVideoToStorage = async (
   file: File
 ): Promise<Result<string>> => {
   try {
-    const storage = getFirebaseStorage();
-    const baseName = file.name.replace(/\.[^/.]+$/, "") || "video";
-    const fileName = `${Date.now()}_${baseName}.mp4`;
-    const storageRef = ref(storage, `projects/${projectId}/videos/${fileName}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    return success(downloadUrl);
+    return uploadViaApi(projectId, file, "video");
   } catch (error) {
-    return failure(error instanceof Error ? error : "Failed to upload video");
+    return failure(error instanceof Error ? error.message : "Failed to upload video");
   }
 };
 

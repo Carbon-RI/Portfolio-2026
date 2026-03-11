@@ -228,7 +228,7 @@
    ========================================================================== */
 @layer components {
   /* ---------- Typography ---------- */
-  /* Button font: text-* と競合しないよう text- で始めない（tailwind-merge 対策） */
+  /* Button font: avoid starting with text- so it doesn't conflict with text-* (tailwind-merge) */
   .btn-font {
     font-size: var(--text-xs);
     @apply font-mono uppercase tracking-nav;

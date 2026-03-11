@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      # Anonymous volume: use container's node_modules to avoid host/container conflicts (e.g. Mac vs Linux)
+      - /app/node_modules
+    env_file:
+      - .env.local
+    stdin_open: true
+    tty: true

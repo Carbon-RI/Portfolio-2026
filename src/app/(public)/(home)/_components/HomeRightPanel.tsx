@@ -75,12 +75,15 @@ export function HomeRightPanel({
     if (!isAdmin) return [];
     setLoading(true);
     try {
-      const { getAllProjectsClient } = await import(
-        "@/services/client/project-service"
+      const { getAllProjects } = await import(
+        "@/services/server/project-service"
       );
-      const data = await getAllProjectsClient();
-      setProjects(data);
-      return data;
+      const result = await getAllProjects();
+      if (result.success) {
+        setProjects(result.data);
+        return result.data;
+      }
+      return [];
     } catch (error) {
       console.error("[Data] Unexpected error during refetch:", error);
       return [];
@@ -118,11 +121,11 @@ export function HomeRightPanel({
     if (!isAdmin) return;
     const fetchAll = async () => {
       try {
-        const { getAllProjectsClient } = await import(
-          "@/services/client/project-service"
+        const { getAllProjects } = await import(
+          "@/services/server/project-service"
         );
-        const data = await getAllProjectsClient();
-        setProjects(data);
+        const result = await getAllProjects();
+        if (result.success) setProjects(result.data);
       } catch (e) {
         console.error("[Admin] Failed to fetch all projects:", e);
       }
@@ -130,24 +133,8 @@ export function HomeRightPanel({
     fetchAll();
   }, [isAdmin]);
 
-  useEffect(() => {
-    if (!isAdmin) return;
-    let unsub: (() => void) | undefined;
-    const setup = async () => {
-      try {
-        const { subscribeProfileSettings } = await import(
-          "@/services/client/profile-service"
-        );
-        unsub = subscribeProfileSettings(setProfileSettings, (error) =>
-          console.error("[Admin] Subscription error:", error)
-        );
-      } catch (e) {
-        console.error("Failed to load subscription service", e);
-      }
-    };
-    setup();
-    return () => unsub?.();
-  }, [isAdmin]);
+  // Profile: initial data from server props; updates via handleSave → handleProfileUpdate.
+  // Removed client onSnapshot to avoid Firestore "Missing or insufficient permissions" (client SDK uses different auth).
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -155,13 +142,14 @@ export function HomeRightPanel({
     if (editSlug) {
       const syncFullData = async () => {
         try {
-          const [{ getAllProjectsClient }, { mergeProjectAndDraft }] =
+          const [{ getAllProjects }, { mergeProjectAndDraft }] =
             await Promise.all([
-              import("@/services/client/project-service"),
+              import("@/services/server/project-service"),
               import("@/services/utils/project-converter"),
             ]);
-          const data = await getAllProjectsClient();
-          const target = data.find((p) => p.slug === editSlug);
+          const result = await getAllProjects();
+          if (!result.success) return;
+          const target = result.data.find((p) => p.slug === editSlug);
           if (target) {
             setEditingProject(mergeProjectAndDraft(target));
             window.history.replaceState(null, "", window.location.pathname);
