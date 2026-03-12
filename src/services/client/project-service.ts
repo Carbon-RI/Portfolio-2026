@@ -1,4 +1,4 @@
-import { getFirebaseApp } from "@/lib/firebase/client";
+import { getFirebaseApp } from "@/lib/firebase/client-app";
 import {
   FullProjectData,
   Result,
