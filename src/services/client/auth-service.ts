@@ -30,7 +30,7 @@ export const loginWithEmail = async (
   password: string
 ): Promise<Result<void>> => {
   try {
-    const { getFirebaseAuth } = await import("@/lib/firebase/client");
+    const { getFirebaseAuth } = await import("@/lib/firebase/client-auth");
     const { signInWithEmailAndPassword } = await import("firebase/auth");
     const auth = getFirebaseAuth();
     const userCredential = await signInWithEmailAndPassword(
@@ -50,7 +50,7 @@ export const loginWithEmail = async (
  */
 export const loginWithGoogle = async (): Promise<Result<void>> => {
   try {
-    const { getFirebaseAuth } = await import("@/lib/firebase/client");
+    const { getFirebaseAuth } = await import("@/lib/firebase/client-auth");
     const { GoogleAuthProvider, signInWithPopup } = await import(
       "firebase/auth"
     );
