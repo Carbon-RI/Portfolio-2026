@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { LG_QUERY, SCROLL_CONFIG, type SectionId } from "@/types";
 import { Button } from "@/components/shared/Button";
@@ -11,11 +11,16 @@ interface HeaderClientProps {
   sections: readonly SectionId[];
 }
 
+/** Mobile (max-lg): hide section nav on project detail routes. */
+const PROJECT_DETAIL_PATH = /^\/projects\/[^/]+$/;
+
 export function HeaderClient({ sections }: HeaderClientProps) {
   const { isAdmin, refreshSession } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState<SectionId>("welcome");
   const router = useRouter();
+  const pathname = usePathname();
+  const hideMobileSectionNav = PROJECT_DETAIL_PATH.test(pathname);
 
   const headerHeightRef = useRef<number>(56);
   const matchMediaRef = useRef<MediaQueryList | null>(null);
@@ -105,7 +110,9 @@ export function HeaderClient({ sections }: HeaderClientProps) {
   return (
     <>
       <nav
-        className="flex lg:hidden justify-center px-2 h-full"
+        className={`${
+          hideMobileSectionNav ? "hidden" : "flex lg:hidden"
+        } justify-center px-2 h-full`}
         aria-label="Mobile navigation"
       >
         <ul className="flex items-center gap-4 min-[375px]:gap-6 h-full">
