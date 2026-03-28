@@ -174,7 +174,7 @@ export const ProjectCard = ({
           {shouldShowDetailLink && (
             <Link
               href={processNotesPath}
-              className="nav-link flex items-center text-content-primary font-bold"
+              className="nav-link flex items-center"
             >
               <FaFileAlt className="w-3 h-3 mr-1.5" /> Notes
             </Link>

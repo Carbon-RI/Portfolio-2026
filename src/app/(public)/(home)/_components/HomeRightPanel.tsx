@@ -56,6 +56,10 @@ export function HomeRightPanel({
   const [profileSettings, setProfileSettings] = useState<ProfileSettings>(
     initialProfileSettings
   );
+
+  useEffect(() => {
+    setProjects(initialProjects);
+  }, [initialProjects]);
   const [loading, setLoading] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [adminDisplayProjects, setAdminDisplayProjects] = useState<
@@ -142,16 +146,16 @@ export function HomeRightPanel({
     if (editSlug) {
       const syncFullData = async () => {
         try {
-          const [{ getAllProjects }, { mergeProjectAndDraft }] =
-            await Promise.all([
-              import("@/services/server/project-service"),
-              import("@/services/utils/project-converter"),
-            ]);
+          const { getAllProjects } = await import(
+            "@/services/server/project-service"
+          );
           const result = await getAllProjects();
           if (!result.success) return;
           const target = result.data.find((p) => p.slug === editSlug);
           if (target) {
-            setEditingProject(mergeProjectAndDraft(target));
+            // Pass raw project (keep `draft`) so ProjectEditModal can detect
+            // hasPersistedDraft and enable Publish after Notes save.
+            setEditingProject(target);
             window.history.replaceState(null, "", window.location.pathname);
           }
         } catch (e) {

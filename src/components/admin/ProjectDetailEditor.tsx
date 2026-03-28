@@ -76,9 +76,15 @@ const MediaItem = ({
                   type="file"
                   accept="image/*"
                   disabled={isUploading}
-                  onChange={(e) =>
-                    e.target.files?.[0] && onImageUpload(e.target.files[0])
-                  }
+                  onChange={async (e) => {
+                    const input = e.target;
+                    const file = input.files?.[0];
+                    try {
+                      if (file) await onImageUpload(file);
+                    } finally {
+                      input.value = "";
+                    }
+                  }}
                   className="hidden"
                 />
               </label>
@@ -91,9 +97,15 @@ const MediaItem = ({
                   type="file"
                   accept="video/mp4"
                   disabled={isUploading}
-                  onChange={(e) =>
-                    e.target.files?.[0] && onVideoUpload(e.target.files[0])
-                  }
+                  onChange={async (e) => {
+                    const input = e.target;
+                    const file = input.files?.[0];
+                    try {
+                      if (file) await onVideoUpload(file);
+                    } finally {
+                      input.value = "";
+                    }
+                  }}
                   className="hidden"
                 />
               </label>
@@ -119,8 +131,10 @@ const MediaItem = ({
         )}
 
         <button
+          type="button"
           onClick={onRemove}
-          className="text-layer-muted hover:text-accent-2 transition-colors px-2 text-xl leading-none"
+          disabled={isUploading}
+          className="text-layer-muted hover:text-accent-2 transition-colors px-2 text-xl leading-none disabled:opacity-40 disabled:pointer-events-none"
           title="Remove media"
         >
           ×
@@ -164,8 +178,10 @@ const SectionItem = ({
           Section {sIndex + 1}
         </span>
         <button
+          type="button"
           onClick={onRemove}
-          className="text-xs-mono text-layer-medium hover:text-accent-2 transition-all duration-normal"
+          disabled={isUploading}
+          className="text-xs-mono text-layer-medium hover:text-accent-2 transition-all duration-normal disabled:opacity-40 disabled:pointer-events-none"
         >
           [ Remove Section ]
         </button>
@@ -204,6 +220,7 @@ const SectionItem = ({
           <Button
             variant="dashed"
             onClick={onAddMedia}
+            disabled={isUploading}
             className="py-3"
           >
             + Add Media Item

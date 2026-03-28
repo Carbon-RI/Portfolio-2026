@@ -196,12 +196,21 @@ export const ProjectContentClient = ({
 
   const backConfig =
     isAdmin && isFromBasicInfo
-      ? { href: `/?edit=${project.slug}`, label: "Back to Basic Info" }
+      ? { href: `/?edit=${encodeURIComponent(project.slug)}`, label: "Back to Basic Info" }
       : { href: "/", label: "Back to Portfolio" };
 
-  const handleSaveSuccess = () => {
-    setIsEditMode(false);
+  /** After Notes edit (Save or Cancel), return to Project Detail = Basic Info modal on home. */
+  const navigateToProjectBasicInfo = useCallback(() => {
+    if (!project.slug) {
+      setIsEditMode(false);
+      return;
+    }
+    router.push(`/?edit=${encodeURIComponent(project.slug)}`);
     router.refresh();
+  }, [project.slug, router]);
+
+  const handleSaveSuccess = () => {
+    navigateToProjectBasicInfo();
   };
 
   const handleSave = async () => {
@@ -245,7 +254,7 @@ export const ProjectContentClient = ({
               <>
                 <Button
                   variant="secondary"
-                  onClick={() => setIsEditMode(false)}
+                  onClick={navigateToProjectBasicInfo}
                   className="tracking-tight"
                 >
                   Cancel

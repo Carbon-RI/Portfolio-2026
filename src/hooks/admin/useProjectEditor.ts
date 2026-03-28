@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect, useReducer } from "react";
+import { toast } from "sonner";
 import {
   FullProjectData,
   TechIconKey,
@@ -222,7 +223,13 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
           "@/services/client/project-service"
         );
         const result = await uploadImageToStorage(draftData.id, file);
-        if (result.success) updateMedia(sIndex, mIndex, "url", result.data);
+        if (result.success) {
+          updateMedia(sIndex, mIndex, "url", result.data);
+        } else {
+          toast.error(result.error.message);
+        }
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Image upload failed");
       } finally {
         setIsUploading(false);
       }
@@ -239,7 +246,13 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
           "@/services/client/project-service"
         );
         const result = await uploadVideoToStorage(draftData.id, file);
-        if (result.success) updateMedia(sIndex, mIndex, "url", result.data);
+        if (result.success) {
+          updateMedia(sIndex, mIndex, "url", result.data);
+        } else {
+          toast.error(result.error.message);
+        }
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Video upload failed");
       } finally {
         setIsUploading(false);
       }
