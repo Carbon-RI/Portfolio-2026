@@ -136,10 +136,12 @@ npm run test -- --coverage
 
 ### Setup
 
+You need a **Firebase project** (Firestore, Auth, Storage as used in this app) and values for the variables in `.env.example`. Copy the example file and fill in secrets locally—**do not commit** `.env.local`.
+
 ```bash
 npm install
 cp .env.example .env.local
-# Add Firebase config and email settings to .env.local
+# Edit .env.local: Firebase client + Admin SDK + email (see Environment Variables)
 ```
 
 ### Commands
@@ -151,25 +153,34 @@ npm run test
 npm run test -- --coverage
 ```
 
-### Docker (Local Development)
+### Docker (local development)
 
-The project is Dockerized so others can run it locally without manual setup.
+Docker runs the same dev server as `npm run dev`; it **does not** remove the need for Firebase or environment variables. You still configure credentials as in [Setup](#setup).
 
-**Prerequisites**: Install [Docker](https://docs.docker.com/get-docker/).
+**What it helps with**: A consistent Node toolchain without installing Node on the host, and the same commands on macOS, Windows, or Linux.
 
-**Steps**:
+**Prerequisites**
 
-1. Clone the repository and move to the project root
-2. Copy `.env.example` to `.env.local` and fill in Firebase and email settings
-3. Start the app:
+- [Docker](https://docs.docker.com/get-docker/) with **Docker Compose v2.24+** (current Docker Desktop includes this)
+- Firebase project and filled env vars (same as non-Docker development)
+
+**Environment files and Compose**
+
+Compose loads `.env.example` first, then `.env.local` **if it exists** (later entries override earlier ones). That means `docker compose up` does not fail merely because `.env.local` is missing—but the app will not run meaningfully until variables are set (usually by copying `.env.example` to `.env.local` and editing `.env.local`, which stays gitignored).
+
+**Steps**
+
+1. Clone the repository and `cd` into the project root.
+2. `cp .env.example .env.local` and edit `.env.local` with your Firebase and email values.
+3. Start the dev server in a container:
 
 ```bash
 docker compose up
 ```
 
-Open http://localhost:3000 in your browser. Source changes are reflected immediately via hot reload.
+Open http://localhost:3000. Edits on the host are picked up inside the container (hot reload).
 
-- Run in background: `docker compose up -d`
+- Background: `docker compose up -d`
 - Stop: `docker compose down`
 
 ---
@@ -178,16 +189,18 @@ Open http://localhost:3000 in your browser. Source changes are reflected immedia
 
 | Variable | Purpose |
 |----------|---------|
-| `NEXT_PUBLIC_FIREBASE_*` | Firebase Client SDK |
-| `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Firebase Admin SDK |
-| `EMAIL_*`, `CONTACT_EMAIL` | Contact form (Nodemailer) |
-| `NEXT_PUBLIC_SITE_URL` | Base URL for sitemap / metadata |
+| `NEXT_PUBLIC_FIREBASE_*` | Firebase client SDK (including `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, required by `next.config.ts`) |
+| `NEXT_PUBLIC_ADMIN_UID`, `ADMIN_UID` | Admin user identification |
+| `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Firebase Admin SDK (server) |
+| `EMAIL_*` | SMTP / Nodemailer (`EMAIL_USER`, `EMAIL_PASS`; optional `EMAIL_HOST`) |
+| `CONTACT_EMAIL` | Inbound address for contact form notifications (see `api/contact`) |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site URL for sitemap and metadata |
 
 ---
 
 ## Future Extensibility
 
-The architecture is designed for containerization and easy deployment. Docker-ready architecture is supported for future scaling and deployment automation.
+The layout keeps server and client boundaries clear so features can grow without entangling Firebase Admin with browser code. Deployment targets (e.g. Vercel) and tooling can evolve independently of the app structure.
 
 ---
 
