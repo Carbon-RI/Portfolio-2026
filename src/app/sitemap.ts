@@ -3,8 +3,10 @@ import { getPublishedProjects } from "@/services/server/project-service";
 
 function getBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_SITE_URL;
-  if (url) return url.replace(/\/$/, "");
-  return "http://localhost:3000";
+  if (!url && process.env.NODE_ENV === "production") {
+    throw new Error("NEXT_PUBLIC_SITE_URL is required in production");
+  }
+  return (url || "http://localhost:3000").replace(/\/$/, "");
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
