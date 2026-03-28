@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
 
-const FIREBASE_AUTH_DOMAIN =
-  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ??
-  "my-portfolio-de333.firebaseapp.com";
+const FIREBASE_AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN;
+if (!FIREBASE_AUTH_DOMAIN) {
+  throw new Error(
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN is required. Set it in .env.local or your deployment environment."
+  );
+}
 
 const nextConfig: NextConfig = {
   async rewrites() {
