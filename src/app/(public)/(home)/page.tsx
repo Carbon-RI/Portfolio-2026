@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const profile = result.success ? result.data : defaultSettings;
 
   return {
-    title: profile.welcomeMessageHeading || "Debugging Life",
+    title: profile.name || "Portfolio",
     description:
       profile.aboutMeText?.substring(0, 160) ||
       "Portfolio profile description.",

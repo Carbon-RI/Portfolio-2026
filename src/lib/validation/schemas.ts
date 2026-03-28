@@ -10,17 +10,17 @@ export const profileSettingsSchema = z.object({
   aboutMeText: z.string().default(""),
   linkedinUrl: z
     .string()
-    .url("Please enter a valid URL")
+    .regex(/^https?:\/\/.+/, "Please enter a valid URL")
     .or(z.literal(""))
     .default(""),
   githubUrl: z
     .string()
-    .url("Please enter a valid URL")
+    .regex(/^https?:\/\/.+/, "Please enter a valid URL")
     .or(z.literal(""))
     .default(""),
   emailAddress: z
     .string()
-    .email("Please enter a valid email address")
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address")
     .or(z.literal(""))
     .default(""),
   welcomeMessageHeading: z.string().default(""),
@@ -70,17 +70,17 @@ export const projectSchema = z.object({
   summary: z.string().default(""),
   imageSrc: z
     .string()
-    .url("Please enter a valid image URL")
+    .regex(/^https?:\/\/.+/, "Please enter a valid image URL")
     .or(z.literal(""))
     .default(""),
   githubUrl: z
     .string()
-    .url("Please enter a valid GitHub URL")
+    .regex(/^https?:\/\/.+/, "Please enter a valid GitHub URL")
     .or(z.literal(""))
     .default(""),
   demoUrl: z
     .string()
-    .url("Please enter a valid demo URL")
+    .regex(/^https?:\/\/.+/, "Please enter a valid demo URL")
     .or(z.literal(""))
     .default(""),
   techStack: z.array(z.string()).default([]),

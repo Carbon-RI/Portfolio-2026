@@ -23,6 +23,20 @@ interface ProjectContentClientProps {
 /** Section is active when in central 10% of viewport (45% inset top/bottom). */
 const ROOT_MARGIN_PROJECT_SECTION_ACTIVE = "-45% 0px -45% 0px";
 
+/** True while any element is in fullscreen (video/iframe). Updating active section then remounts the left ImageSlider and exits fullscreen. */
+function isDocumentFullscreen(): boolean {
+  if (typeof document === "undefined") return false;
+  const doc = document as Document & {
+    webkitFullscreenElement?: Element | null;
+    mozFullScreenElement?: Element | null;
+  };
+  return !!(
+    document.fullscreenElement ??
+    doc.webkitFullscreenElement ??
+    doc.mozFullScreenElement
+  );
+}
+
 const ProjectSection = ({
   section,
   index,
@@ -150,6 +164,7 @@ export const ProjectContentClient = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isDocumentFullscreen()) return;
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const index = entry.target.getAttribute("data-index");
@@ -181,12 +196,21 @@ export const ProjectContentClient = ({
 
   const backConfig =
     isAdmin && isFromBasicInfo
-      ? { href: `/?edit=${project.slug}`, label: "Back to Basic Info" }
+      ? { href: `/?edit=${encodeURIComponent(project.slug)}`, label: "Back to Basic Info" }
       : { href: "/", label: "Back to Portfolio" };
 
-  const handleSaveSuccess = () => {
-    setIsEditMode(false);
+  /** After Notes edit (Save or Cancel), return to Project Detail = Basic Info modal on home. */
+  const navigateToProjectBasicInfo = useCallback(() => {
+    if (!project.slug) {
+      setIsEditMode(false);
+      return;
+    }
+    router.push(`/?edit=${encodeURIComponent(project.slug)}`);
     router.refresh();
+  }, [project.slug, router]);
+
+  const handleSaveSuccess = () => {
+    navigateToProjectBasicInfo();
   };
 
   const handleSave = async () => {
@@ -230,7 +254,7 @@ export const ProjectContentClient = ({
               <>
                 <Button
                   variant="secondary"
-                  onClick={() => setIsEditMode(false)}
+                  onClick={navigateToProjectBasicInfo}
                   className="tracking-tight"
                 >
                   Cancel

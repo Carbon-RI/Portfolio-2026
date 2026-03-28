@@ -41,11 +41,17 @@ export async function POST(
     }
 
     const bucket = getAdminStorage().bucket(BUCKET_NAME);
-    const ext = file.name.split(".").pop() || (type === "video" ? "mp4" : "jpg");
+    const rawExt = file.name.includes(".")
+      ? file.name.split(".").pop()!
+      : "";
+    const ext =
+      rawExt.replace(/[^a-zA-Z0-9]/g, "") ||
+      (type === "video" ? "mp4" : "jpg");
+    const unique = `${Date.now()}_${randomUUID().slice(0, 8)}`;
     const fileName =
       type === "video"
-        ? `projects/${projectId}/videos/${Date.now()}_${randomUUID().slice(0, 8)}.${ext}`
-        : `projects/${projectId}/images/${Date.now()}_${file.name}`;
+        ? `projects/${projectId}/videos/${unique}.${ext}`
+        : `projects/${projectId}/images/${unique}.${ext}`;
 
     const fileRef = bucket.file(fileName);
     const buffer = Buffer.from(await file.arrayBuffer());

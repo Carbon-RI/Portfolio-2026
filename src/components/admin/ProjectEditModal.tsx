@@ -63,6 +63,18 @@ export const ProjectEditModal = ({
     [draftData, baseData]
   );
 
+  /**
+   * Firestore `draft` subdocument exists (Notes Save or "Save Draft" here wrote to FB).
+   * For published projects, Publish must depend on this — not on local `isDirty` alone —
+   * so Basic Info edits are not publishable until saved as draft; Notes flow stays:
+   * Notes Save → FB draft → Publish enabled here.
+   */
+  const hasPersistedDraft = Boolean(
+    initialProject.draft &&
+      typeof initialProject.draft === "object" &&
+      Object.keys(initialProject.draft).length > 0
+  );
+
   const handleClose = useCallback(async () => {
     if (
       !hasSavedDuringSession &&
@@ -248,7 +260,7 @@ export const ProjectEditModal = ({
                 disabled={
                   isUploading ||
                   !isSlugValid ||
-                  (draftData.published && !isDirty)
+                  (draftData.published && !hasPersistedDraft)
                 }
               >
                 Publish Now
