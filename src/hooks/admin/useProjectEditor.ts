@@ -14,8 +14,14 @@ import {
 import { projectSchema } from "@/lib/validation/schemas";
 import { extractYouTubeId } from "@/services/utils/project-formatter";
 
+function normalizeProjectInput(p: FullProjectData): FullProjectData {
+  const result = projectSchema.safeParse(p);
+  return result.success ? (result.data as FullProjectData) : p;
+}
+
 // --- Types for Reducer ---
 type ProjectAction =
+  | { type: "RESET"; payload: FullProjectData }
   | { type: "SET_FIELD"; field: keyof FullProjectData; value: unknown }
   | { type: "TOGGLE_TECH"; techKey: TechIconKey }
   | { type: "ADD_SECTION" }
@@ -42,6 +48,8 @@ function projectReducer(
   action: ProjectAction
 ): FullProjectData {
   switch (action.type) {
+    case "RESET":
+      return normalizeProjectInput(action.payload);
     case "SET_FIELD":
       return { ...state, [action.field]: action.value };
     case "TOGGLE_TECH": {
@@ -125,15 +133,16 @@ export const useProjectEditor = (initialProject: FullProjectData) => {
   const [draftData, dispatch] = useReducer(
     projectReducer,
     initialProject,
-    (p) => {
-      const result = projectSchema.safeParse(p);
-      return result.success ? (result.data as FullProjectData) : p;
-    }
+    normalizeProjectInput
   );
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(
     initialProject.imageSrc
   );
+
+  useEffect(() => {
+    dispatch({ type: "RESET", payload: initialProject });
+  }, [initialProject.id, initialProject.updatedAt]);
 
   useEffect(() => {
     setPreviewUrl(initialProject.imageSrc);
