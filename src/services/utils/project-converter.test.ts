@@ -15,7 +15,7 @@ const baseFirestoreData: Record<string, unknown> = {
   slug: "my-project",
   title: "My Project",
   category: ["Web App"],
-  industry: "SaaS",
+  industry: "General",
   summary: "Summary",
   imageSrc: "https://example.com/img.png",
   githubUrl: "https://github.com/foo",
@@ -35,7 +35,7 @@ describe("mapToFullData", () => {
     expect(result.slug).toBe("my-project");
     expect(result.title).toBe("My Project");
     expect(result.category).toEqual(["Web App"]);
-    expect(result.industry).toBe("SaaS");
+    expect(result.industry).toBe("General");
     expect(result.techStack).toEqual(["SiReact", "SiNextdotjs"]);
     expect(result.published).toBe(true);
     expect(result.is_deleted).toBe(false);

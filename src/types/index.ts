@@ -61,9 +61,10 @@ export const PROJECT_CATEGORIES = [
   "Mobile App",
   "PWA",
   "Desktop Tool",
-  "SaaS",
-  "AI Solution",
+  "SaaS / Cloud Service",
+  "AI / ML Solution",
   "Browser Extension",
+  "CMS / Admin Suite",
 ] as const;
 export const PROJECT_INDUSTRIES = [
   "Med Tech",
@@ -71,7 +72,10 @@ export const PROJECT_INDUSTRIES = [
   "Fin Tech",
   "E-commerce",
   "Ed Tech",
-  "SaaS",
+  "DevTools",
+  "Prop Tech",
+  "Logistics",
+  "General",
 ] as const;
 
 export type ProjectCategory =

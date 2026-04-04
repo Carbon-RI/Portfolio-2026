@@ -1,5 +1,8 @@
 import { IconType } from "react-icons";
-import { FaAws, FaDocker, FaPython, FaGitAlt, FaNodeJs } from "react-icons/fa";
+import { 
+  FaAws, FaDocker, FaPython, FaGitAlt, FaNodeJs, 
+  FaHtml5, FaCss3Alt 
+} from "react-icons/fa";
 import {
   SiReact,
   SiNextdotjs,
@@ -24,29 +27,40 @@ import {
   SiZod,
   SiFigma,
   SiPostman,
+  SiJavascript,
+  SiExpress,
+  SiJsonwebtokens,
+  SiReactrouter,
+  SiReactquery,
+  SiAxios,
+  SiFramer,
+  SiLucide
 } from "react-icons/si";
 
-/** Tech stack icons. Categories for reference:
- * Frontend: React, Next.js, TypeScript, Tailwind CSS, shadcn/ui
- * Backend: NestJS, Node.js, Go, Python, GraphQL
- * Database: PostgreSQL, MongoDB, Supabase, Firebase, Prisma, Redis
- * AI: OpenAI, Anthropic
- * Infra: AWS, Google Cloud, Docker, Vercel
- * Tools: Vite, Jest, Zod, Git, Figma, Postman
- */
+/** Tech stack icons. Updated for enhanced project visualization. */
 export const TechIconMap = {
-  // Frontend
+  // Frontend & Fundamentals
+  FaHtml5,
+  FaCss3Alt,
+  SiJavascript,
   SiReact,
   SiNextdotjs,
   SiTypescript,
   SiTailwindcss,
   SiShadcnui,
-  // Backend
+  SiReactrouter,
+  SiReactquery,
+  SiFramer,
+  SiLucide,
+  // Backend & Security
   SiNestjs,
   FaNodeJs,
+  SiExpress,
   SiGo,
   FaPython,
   SiGraphql,
+  SiJsonwebtokens,
+  SiAxios,
   // Database
   SiPostgresql,
   SiMongodb,
