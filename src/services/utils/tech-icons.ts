@@ -1,7 +1,12 @@
 import { IconType } from "react-icons";
-import { 
-  FaAws, FaDocker, FaPython, FaGitAlt, FaNodeJs, 
-  FaHtml5, FaCss3Alt 
+import {
+  FaAws,
+  FaDocker,
+  FaPython,
+  FaGitAlt,
+  FaNodeJs,
+  FaHtml5,
+  FaCss3Alt,
 } from "react-icons/fa";
 import {
   SiReact,
@@ -20,6 +25,7 @@ import {
   SiRedis,
   SiOpenai,
   SiAnthropic,
+  SiGooglegemini,
   SiGooglecloud,
   SiVercel,
   SiVite,
@@ -34,8 +40,11 @@ import {
   SiReactquery,
   SiAxios,
   SiFramer,
-  SiLucide
+  SiLucide,
+  SiExpo,
+  SiAmazonec2,
 } from "react-icons/si";
+import { VscAzure } from "react-icons/vsc";
 
 /** Tech stack icons. Updated for enhanced project visualization. */
 export const TechIconMap = {
@@ -44,6 +53,7 @@ export const TechIconMap = {
   FaCss3Alt,
   SiJavascript,
   SiReact,
+  SiExpo,
   SiNextdotjs,
   SiTypescript,
   SiTailwindcss,
@@ -71,9 +81,12 @@ export const TechIconMap = {
   // AI
   SiOpenai,
   SiAnthropic,
+  SiGooglegemini,
   // Infra
   FaAws,
+  SiAmazonec2,
   SiGooglecloud,
+  VscAzure,
   FaDocker,
   SiVercel,
   // Tools
