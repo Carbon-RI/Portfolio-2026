@@ -53,6 +53,9 @@ export const ImageSlider = ({
             <video
               key={currentItem.url}
               src={currentItem.url}
+              autoPlay
+              muted
+              loop
               controls
               className="w-full h-full object-contain"
               playsInline

@@ -227,6 +227,7 @@ export const ProjectContentClient = ({
     <div className="hidden lg:flex sticky-top h-(--content-height-no-footer) flex-col items-center justify-center bg-base-bg p-12 pb-32 border-r border-base-border">
       <div className="w-full h-full max-w-4xl max-h-(--vh-70)">
         <ImageSlider
+          key={`${project.id}-${activeSectionIndex}`}
           media={currentSection?.media || []}
           title={project.title}
           priority={true}
