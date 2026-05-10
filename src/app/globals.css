@@ -132,14 +132,14 @@
   }
 
   /* Project card height + spacing behavior (desktop only) */
-  @media (min-width: 1024px) and (min-height: 800px) {
+  @media (min-width: 1024px) and (min-height: 850px) {
     :root {
       --project-card-image-height: 320px;
       --project-card-gap: 1.75rem;
     }
   }
 
-  @media (min-width: 1024px) and (min-height: 600px) and (max-height: 799px) {
+  @media (min-width: 1024px) and (min-height: 600px) and (max-height: 849px) {
     :root {
       --project-card-image-height: clamp(
         100px,
