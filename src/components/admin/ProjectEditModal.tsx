@@ -136,7 +136,7 @@ export const ProjectEditModal = ({
 
       await onProjectDataChange();
 
-      if (mode === "publish" || mode === "unpublish") {
+      if (mode === "unpublish") {
         onClose();
       } else {
         setHasSavedDuringSession(true);
