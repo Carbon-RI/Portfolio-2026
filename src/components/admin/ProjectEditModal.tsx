@@ -97,6 +97,37 @@ export const ProjectEditModal = ({
 
   const executeAction = useCallback(
     async (mode: "draft" | "publish" | "unpublish"): Promise<string | null> => {
+      if (mode === "publish") {
+        const { getProjectData, publishProject } = await import(
+          "@/services/server/project-service"
+        );
+        const latestProjectResult = await getProjectData(initialProject.id);
+        if (!latestProjectResult.success) {
+          toast.error(latestProjectResult.error.message);
+          return null;
+        }
+
+        const latestProject = latestProjectResult.data;
+        const latestForPublish = mergeProjectAndDraft(latestProject);
+        const localUpdatedAt = initialProject.updatedAt ?? 0;
+        const latestUpdatedAt = latestProject.updatedAt ?? 0;
+
+        if (latestUpdatedAt > localUpdatedAt) {
+          toast.info("Latest draft detected. Publishing with the newest content.");
+        }
+
+        const { id, ...publishFields } = latestForPublish;
+        const publishResult = await publishProject(id, publishFields);
+        if (!publishResult.success) {
+          toast.error(publishResult.error.message);
+          return null;
+        }
+
+        await onProjectDataChange();
+        onClose();
+        return latestForPublish.slug;
+      }
+
       const result = await save(mode);
       if (!result.success) {
         toast.error(result.error.message);
@@ -105,7 +136,7 @@ export const ProjectEditModal = ({
 
       await onProjectDataChange();
 
-      if (mode === "publish" || mode === "unpublish") {
+      if (mode === "unpublish") {
         onClose();
       } else {
         setHasSavedDuringSession(true);
@@ -115,7 +146,14 @@ export const ProjectEditModal = ({
 
       return draftData.slug;
     },
-    [save, onProjectDataChange, onClose, draftData.slug]
+    [
+      save,
+      onProjectDataChange,
+      onClose,
+      draftData.slug,
+      initialProject.id,
+      initialProject.updatedAt,
+    ]
   );
 
   const editorStatus: ProjectStatus = useMemo(() => {
