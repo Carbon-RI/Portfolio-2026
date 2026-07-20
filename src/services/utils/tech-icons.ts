@@ -43,8 +43,19 @@ import {
   SiLucide,
   SiExpo,
   SiAmazonec2,
+  SiHono,
+  SiCloudflareworkers,
+  SiDrizzle,
+  SiVitest,
+  SiGithubactions,
 } from "react-icons/si";
 import { VscAzure } from "react-icons/vsc";
+import {
+  ZustandIcon,
+  PlaywrightIcon,
+  DexieIcon,
+  PdfJsIcon,
+} from "@/services/utils/custom-tech-icons";
 
 /** Tech stack icons. Updated for enhanced project visualization. */
 export const TechIconMap = {
@@ -62,10 +73,13 @@ export const TechIconMap = {
   SiReactquery,
   SiFramer,
   SiLucide,
+  // State Management
+  ZustandIcon,
   // Backend & Security
   SiNestjs,
   FaNodeJs,
   SiExpress,
+  SiHono,
   SiGo,
   FaPython,
   SiGraphql,
@@ -78,6 +92,8 @@ export const TechIconMap = {
   SiFirebase,
   SiPrisma,
   SiRedis,
+  SiDrizzle,
+  DexieIcon,
   // AI
   SiOpenai,
   SiAnthropic,
@@ -89,13 +105,18 @@ export const TechIconMap = {
   VscAzure,
   FaDocker,
   SiVercel,
-  // Tools
+  SiCloudflareworkers,
+  // Tools & Testing
   SiVite,
   SiJest,
+  SiVitest,
+  PlaywrightIcon,
   SiZod,
   FaGitAlt,
+  SiGithubactions,
   SiFigma,
   SiPostman,
+  PdfJsIcon,
 } as const satisfies Record<string, IconType>;
 
 export type TechIconKey = keyof typeof TechIconMap;
